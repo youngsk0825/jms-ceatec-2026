@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="마쿠하리 플래너">
+<meta name="theme-color" content="#efe6d2">
+<title>마쿠하리 10월 플래너</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 행사장 안내서 같은 단일 칼럼 — 상단 일자 스트립, 아래 타임라인. 파피루스 바탕에 잉크 블루 강조 */
+:root{
+  --bg:#efe6d2; --paper:#f7f1e3; --line:#d8ccb1; --ink:#1f2a3c; --muted:#6b6455;
+  --accent:#1d3a6e; --accent-soft:#dde3ee; --jms:#8a3b1f; --jms-soft:#f1dfd2; --ceatec:#1d5a52; --ceatec-soft:#d6e8e3;
+  --k-sp:#24186f; --k-sp-soft:#e1def3; --k-bs:#2b7d97; --k-bs-soft:#d7ecf2; --k-st:#5d5a55; --k-st-soft:#e6e2da;
+  --warn:#a3361b; --warn-soft:#f6dcd2; --ok:#2f6b3a;
+  --f-display:"Nanum Myeongjo","Batang",serif; --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141a24; --paper:#1b2230; --line:#2f3a4d; --ink:#ece4d2; --muted:#a49c8a;
+  --accent:#9db5e6; --accent-soft:#25324a; --jms:#e3a07f; --jms-soft:#3a271f; --ceatec:#86c9bc; --ceatec-soft:#1d3532;
+  --k-sp:#b7adf2; --k-sp-soft:#2a2550; --k-bs:#8fd0e3; --k-bs-soft:#1c3640; --k-st:#c9c3b8; --k-st-soft:#33302c;
+  --warn:#f09277; --warn-soft:#3d2219; --ok:#8fcf98; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141a24; --paper:#1b2230; --line:#2f3a4d; --ink:#ece4d2; --muted:#a49c8a;
+  --accent:#9db5e6; --accent-soft:#25324a; --jms:#e3a07f; --jms-soft:#3a271f; --ceatec:#86c9bc; --ceatec-soft:#1d3532;
+  --k-sp:#b7adf2; --k-sp-soft:#2a2550; --k-bs:#8fd0e3; --k-bs-soft:#1c3640; --k-st:#c9c3b8; --k-st-soft:#33302c;
+  --warn:#f09277; --warn-soft:#3d2219; --ok:#8fcf98; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:20px 64px}
+header{display:grid;gap:6px;padding-bottom:16px;border-bottom:2px solid var(--accent)}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--f-display);font-size:clamp(26px,5vw,36px);line-height:1.2;margin:0;color:var(--accent);text-wrap:balance}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.dday{display:inline-flex;align-items:baseline;gap:8px;margin-top:4px}
+.dday b{font-family:var(--f-mono);font-size:22px;color:var(--accent)}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;padding-block:10px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tab{border:0;background:none;font:inherit;font-weight:600;color:var(--muted);padding:8px 12px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--paper)}
+.tab .n{font-family:var(--f-mono);font-size:12px;margin-left:4px;opacity:.85}
+button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-block:16px 10px}
+.day{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 6px;font:inherit;cursor:pointer;color:var(--ink);display:grid;gap:0;text-align:center}
+.day small{color:var(--muted);font-size:12px}
+.day b{font-family:var(--f-mono);font-size:17px}
+.day[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.search{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin-bottom:10px}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sep{width:1px;background:var(--line);margin-inline:4px}
+.list{display:grid;gap:0}
+.slot{display:grid;grid-template-columns:76px 1fr;gap:12px;padding-block:14px;border-top:1px solid var(--line)}
+.slot:first-child{border-top:0}
+.time{font-family:var(--f-mono);font-size:14px;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1.3}
+.time span{display:block;color:var(--muted);font-size:12px}
+.time.tbd{color:var(--warn);font-family:var(--f-body);font-size:12px;font-weight:600}
+.body{min-width:0;display:grid;gap:4px}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.ev{font-weight:600;padding:1px 7px;border-radius:4px;font-size:11px;letter-spacing:.04em}
+.ev.JMS{background:var(--jms-soft);color:var(--jms)}
+.ev.CEATEC{background:var(--ceatec-soft);color:var(--ceatec)}
+.ev.JOINT{background:var(--accent-soft);color:var(--accent)}
+.kind{font-weight:600;padding:1px 7px;border-radius:4px;font-size:11px}
+.kind.special{background:var(--k-sp);color:var(--paper)}
+.kind.business{background:var(--k-bs-soft);color:var(--k-bs)}
+.kind.stage{background:var(--k-st-soft);color:var(--k-st)}
+.group-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-family:var(--f-display);font-size:18px;margin:18px 0 2px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+.group-h.special{color:var(--k-sp);border-color:var(--k-sp)}
+.group-h.business{color:var(--k-bs);border-color:var(--k-bs)}
+.group-h.stage{color:var(--k-st);border-color:var(--k-st)}
+.group-h small{font-family:var(--f-body);font-size:12px;color:var(--muted);font-weight:500}
+.title{font-weight:600;font-size:15.5px;margin:0;text-wrap:balance}
+.ja{font-size:12.5px;color:var(--muted)}
+.who{font-size:13px}
+.row{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.star{flex:none;border:1px solid var(--line);background:var(--paper);color:var(--accent);font:inherit;font-size:13px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.star[aria-pressed="true"]{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.tag{font-size:11px;color:var(--muted);border:1px solid var(--line);padding:0 6px;border-radius:4px}
+.pick{font-size:11px;font-weight:600;color:var(--accent)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:8px}
+.conflict{display:inline-block;background:var(--warn-soft);color:var(--warn);font-size:12px;font-weight:600;padding:1px 8px;border-radius:4px}
+textarea{width:100%;font:inherit;font-size:13.5px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 8px;resize:vertical;min-height:38px}
+.section-h{font-family:var(--f-display);font-size:20px;color:var(--accent);margin:22px 0 4px}
+.note{font-size:13px;color:var(--muted);margin:0 0 10px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-block:14px}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--paper);font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border-radius:6px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.booth{display:grid;grid-template-columns:1fr auto;gap:10px;padding-block:12px;border-top:1px solid var(--line);align-items:start}
+.booth:first-child{border-top:0}
+.booth .body{gap:3px}
+.booth select{font:inherit;font-size:13px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+.check{display:flex;align-items:center;gap:6px;font-size:13px}
+.done .title{text-decoration:line-through;color:var(--muted)}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px;margin-top:16px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:14px;letter-spacing:.04em;color:var(--accent)}
+.panel dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:13.5px}
+.panel dt{color:var(--muted)}
+.panel dd{margin:0;min-width:0}
+.panel p,.panel li{font-size:13.5px;margin:0}
+.panel ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.hallmap{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:8px}
+.hall{text-align:center;font-family:var(--f-mono);font-size:12px;padding:10px 0;border-radius:4px;border:1px solid var(--line)}
+.hall.j{background:var(--jms-soft);color:var(--jms);border-color:transparent}
+.hall.c{background:var(--ceatec-soft);color:var(--ceatec);border-color:transparent}
+.hall.x{color:var(--muted)}
+a{color:var(--accent)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px;font-size:13px}
+.src{font-size:12px;color:var(--muted);margin-top:28px;border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:480px){.slot{grid-template-columns:58px 1fr;gap:10px}.row{flex-direction:column}.star{align-self:flex-start}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Makuhari Messe · 2026.10.13 – 10.16</div>
+    <h1>Japan Mobility Show Bizweek × CEATEC 2026</h1>
+    <p class="sub">두 행사는 같은 등록으로 함께 입장할 수 있습니다. 세션을 담아 하루 동선을 짜세요.</p>
+    <div class="dday"><span class="sub" id="ddayLabel">개막까지</span><b id="dday">D-6</b></div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-time" aria-selected="true" data-view="time">타임테이블</button>
+    <button class="tab" role="tab" id="t-plan" aria-selected="false" data-view="plan">내 일정<span class="n" id="planCount">0</span></button>
+    <button class="tab" role="tab" id="t-booth" aria-selected="false" data-view="booth">부스 방문<span class="n" id="boothCount">0</span></button>
+    <button class="tab" role="tab" id="t-info" aria-selected="false" data-view="info">행사 정보</button>
+  </nav>
+
+  <div id="dayBar" class="days"></div>
+
+  <section id="v-time">
+    <input id="q" class="search" type="search" placeholder="세션 검색 · 제목, 코드, 연사 (예: 반도체, HB-142, 닛산)" aria-label="세션 검색">
+    <div class="filters" id="filters"></div>
+    <div class="list" id="timeList"></div>
+  </section>
+
+  <section id="v-plan" hidden>
+    <div class="toolbar">
+      <button class="btn" id="copyPlan">일정 텍스트 복사</button>
+      <span class="note" style="margin:0">담은 일정과 메모는 이 브라우저에 저장됩니다.</span>
+    </div>
+    <div class="list" id="planList"></div>
+    <h2 class="section-h" id="planBoothH">이날 방문할 부스</h2>
+    <div class="list" id="planBooths"></div>
+  </section>
+
+  <section id="v-booth" hidden>
+    <p class="note" style="margin-top:4px">부스 번호는 아직 공개 전이라 홀 단위로 표시했습니다. 방문일을 지정하면 내 일정에 함께 뜹니다.</p>
+    <div class="filters" id="boothFilters"></div>
+    <div class="list" id="boothList"></div>
+  </section>
+
+  <section id="v-info" hidden>
+    <div class="info">
+      <div class="panel">
+        <h3>기본 정보</h3>
+        <dl>
+          <dt>기간</dt><dd>10/13(화) – 10/16(금)</dd>
+          <dt>CEATEC</dt><dd>10:00 – 17:00</dd>
+          <dt>Bizweek</dt><dd>운영시간 공식 사이트 확인 필요</dd>
+          <dt>입장</dt><dd>무료 · 온라인 사전등록 필수, 한 번 등록으로 두 행사 모두 입장</dd>
+          <dt>규모</dt><dd>Bizweek 217개사(해외 14) · CEATEC 현장 세션 168개, 온라인 12개</dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <h3>홀 배치</h3>
+        <p>국제전시장 홀 1–8 / 국제회의장(컨벤션홀 A·B, 201·301 회의실)</p>
+        <div class="hallmap" aria-label="홀 배치">
+          <div class="hall x">1</div><div class="hall j">2</div><div class="hall j">3</div><div class="hall c">4</div><div class="hall c">5</div><div class="hall c">6</div><div class="hall c">7</div><div class="hall c">8</div>
+        </div>
+        <ul style="margin-top:10px">
+          <li><b style="color:var(--jms)">홀 2–3</b> Bizweek: 자공회 합동전시(중앙), ZONE 1–4, 메인 스테이지</li>
+          <li><b style="color:var(--ceatec)">홀 4–8</b> CEATEC: 홀4 넥스트제너레이션·P스테이지, 홀5 X스테이지, 홀6 T스테이지, 홀8 E스테이지</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Bizweek 4개 ZONE</h3>
+        <ul>
+          <li><b>ZONE 1</b> 멈추지 않는 시스템: 공급망·물류, 핵심자원 안보, 자율주행</li>
+          <li><b>ZONE 2</b> 환경과 경제: 주행 중 무선급전, 수소 간선, CN 연료</li>
+          <li><b>ZONE 3</b> 기술과 사람: 배터리·소재 자원순환, AI·로봇 인재기반</li>
+          <li><b>ZONE 4</b> 사람·물자·데이터 심리스: 인프라 협조형 자율주행, 지역 교통·에너지 통합</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>미팅·매칭</h3>
+        <ul>
+          <li>Meet-up Box에서 현장 비즈니스 미팅과 Plug and Play 공동창출 프로그램 예약: <a href="https://jms-meetupbox.com/" target="_blank" rel="noopener">jms-meetupbox.com</a></li>
+          <li>CEATEC VC/CVC 리버스피치: 10/15 16:00, 홀4 P스테이지</li>
+          <li>공식: <a href="https://www.japan-mobility-show.com/" target="_blank" rel="noopener">japan-mobility-show.com</a> · <a href="https://www.ceatec.com/ja/" target="_blank" rel="noopener">ceatec.com</a></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>가는 길</h3>
+        <ul>
+          <li>JR 게이요선 가이힌마쿠하리역에서 도보 5분 (도쿄역에서 특급 약 24분)</li>
+          <li>나리타공항 고속버스 약 30분 · 하네다공항 약 40분</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <p class="src">출처: CEATEC 공식 세션 리스트(2026.10.7 조회), JAMA 보도자료(2026.8.27), MONOist(2026.9.24, 9.2), 베스트카(2026.9.18), CEATEC 2026 안내장(8.6 기준). 연사는 안내장에 공개된 세션만 적었습니다. 세션 제목·연사·시간은 주최 측 예정 정보이며 변경될 수 있습니다. Bizweek 세션은 미래 모빌리티 회의 공식 페이지(특별세션·비즈니스 세션·스테이지 프로그램, 2026.9.30 기준)를 따랐습니다.</p>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const DAYS=[{d:1,label:"10/13",wd:"화"},{d:2,label:"10/14",wd:"수"},{d:3,label:"10/15",wd:"목"},{d:4,label:"10/16",wd:"금"},{d:5,label:"온라인",wd:""}];
+const EVN={JMS:"Bizweek",CEATEC:"CEATEC",JOINT:"공동"};
+const KN={special:"특별세션",business:"비즈니스 세션",stage:"스테이지 프로그램"};
+const KD={special:"자공회 회장단과 스타트업 CEO의 첫날 기조 토론",business:"자동차사 사장단이 주제별로 토론하는 90분 세션",stage:"업계 단체·기업이 주관하는 60분 프로그램"};
+const TAGS=["모빌리티","반도체","소재·배터리","AI·로봇","에너지·탈탄소","신사업"];
+const OTAGS=["모빌리티","AI 전환","전자부품·반도체","그린·에너지","데이터·클라우드","차세대 통신","스마트시티·홈","보안","스타트업·오픈이노베이션","정책","서스테이너블","차세대 기술"];
+const S=[
+{"id":"jms-sp","d":1,"ev":"JMS","s":"11:00","e":"12:00","code":"미래 모빌리티 회의","ko":"멈추지 않는 일본의 미래를 만든다","who":"사토 고지(자공회 회장·토요타 부회장), 미베 도시히로(자공회 부회장·혼다 사장), 다키노 잇세이(Mujin CEO), 노로 유키(아카리 대표) · 진행 사사키 노리히코(PIVOT CEO)","t":["모빌리티","AI 전환"],"pick":1,"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"special"},
+{"id":"jms-b1","d":1,"ev":"JMS","s":"15:00","e":"16:30","code":"세션 ①","ko":"기술로 사람을 더 사람답게 · 사람을 대체하지 않고 역량을 넓히는 AI·로봇","who":"이반 에스피노사(자공회 부회장·닛산 사장), 오카다 도시히사(프리퍼드 네트웍스 AI 제품·솔루션 사업본부장), 오가타 데쓰야(와세다대 교수·AI로봇협회 이사장) · 진행 스구로 사야카(아나운서)","t":["AI 전환","모빌리티"],"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"business"},
+{"id":"jms-b2","d":2,"ev":"JMS","s":"13:00","e":"14:30","code":"세션 ②","ko":"환경에도 경제에도 좋은 쪽으로 · 지역과 용도에 맞는 에너지 믹스","who":"모로 마사히로(마쓰다 사장), 기시우라 게이스케(미쓰비시자동차 사장), 야마사키 아쓰요시(TBM 대표), 오바 노리아키(포스트오일전략연구소 대표·에너지 애널리스트) · 진행 스구로 사야카(아나운서)","t":["그린·에너지","모빌리티"],"pick":1,"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"business"},
+{"id":"jms-b3","d":3,"ev":"JMS","s":"13:00","e":"14:30","code":"세션 ③","ko":"멈추지 않는 물류 · 상용차, 물류 데이터, 자율주행 관제를 하나로","who":"야마구치 나오히로(자공회 부회장·이스즈 사장), 사티야캄 아리아(히노자동차 사장), 이토 고이치(UD트럭스 사장), 가토 신페이(티어포 CEO), 무라카미 겐지로(Spectee CEO) · 진행 스구로 사야카(아나운서)","t":["모빌리티","데이터·클라우드"],"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"business"},
+{"id":"jms-b4","d":4,"ev":"JMS","s":"13:00","e":"14:30","code":"세션 ④","ko":"사람도 물건도 데이터도 끊김 없이 · 지역마다 옮겨 심을 수 있는 교통 모델","who":"시타라 모토후미(자공회 부회장·야마하발동기 사장), 오사키 아쓰시(SUBARU 사장), 이노우에 마사히로(다이하쓰 사장), 미와 도미오(나고야대 교수), 사이토 세쓰나(AMANE 이사) · 진행 스구로 사야카(아나운서)","t":["모빌리티","스마트시티·홈"],"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"business"},
+{"id":"jms-st1","d":1,"ev":"JMS","s":"13:00","e":"14:00","code":"주관 JAPIA","ko":"비전에서 사회 구현으로 · 협업으로 만든 자동차부품 산업의 새 가치","who":"산와니들베어링, 도켄서모테크, 닛신세이키, 마쓰다전기공업소, 고마쓰세이키 공작소 · 주관 일본자동차부품공업회","t":["모빌리티","스타트업·오픈이노베이션"],"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"stage"},
+{"id":"jms-st2","d":2,"ev":"JMS","s":"11:00","e":"12:00","code":"주관 자공회","ko":"데이터가 사회를 움직인다 · 차량 데이터로 푸는 재난·사회 문제","who":"오야마다 데쓰야(혼다기술연구소), 후쿠모리 유타카(혼다), 다케모토 쓰요시(토요타) · 진행 모모타 겐지(자동차 저널리스트)","t":["모빌리티","데이터·클라우드"],"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"stage"},
+{"id":"jms-st3","d":2,"ev":"JMS","s":"15:30","e":"16:30","code":"주관 PwC","ko":"피지컬 AI가 다시 짜는 모빌리티 개발·운영 사이클","who":"호소이 유스케, 아베 겐타로(PwC컨설팅)","t":["AI 전환","모빌리티"],"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"stage"},
+{"id":"jms-st4","d":3,"ev":"JMS","s":"10:30","e":"11:30","code":"주관 베스트카","ko":"도쿄 모빌리티 회의 2026 · 자공회 회장과 대학생들의 대화","who":"사토 고지(자공회 회장), 와세다·게이오·세이조·도쿄음대 학생, 닛산도치기자동차대학교 학생 · 진행 데라사키 쇼고(베스트카 편집장)","t":["모빌리티"],"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"stage"},
+{"id":"jms-st5","d":3,"ev":"JMS","s":"15:30","e":"16:30","code":"주관 자공회","ko":"모빌리티 비전 2050 · 지역 밀착 이동 서비스, 비전에서 실행으로","who":"기즈 마사후미(자공회 차세대모빌리티정책위원장)와 WG 리더, 토요타 코닉 프로, 와카야마현 고보시, JA와카야마 · 진행 오카다 마사시(아서디리틀)","t":["모빌리티","스마트시티·홈"],"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"stage"},
+{"id":"jms-st6","d":4,"ev":"JMS","s":"11:00","e":"12:00","code":"주관 자공회","ko":"개정 개인정보보호법으로 보는 차량 데이터 보호와 활용","who":"다케자와 레오(야마하발동기 변호사), 도미시게 아키코(혼다), 고쓰키 겐타로(개인정보보호위원회) · 진행 고바야시 신타로(노무라종합연구소)","t":["데이터·클라우드","보안","정책"],"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"stage"},
+{"id":"jms-st7","d":4,"ev":"JMS","s":"15:30","e":"16:30","code":"주관 PwC","ko":"중국 자동차 산업의 강점, 어떻게 우리 경쟁력으로 바꿀까","who":"난보 겐, 사토 료타(PwC컨설팅)","t":["모빌리티"],"v":"Bizweek 포럼 스테이지 (홀 2–3)","k":"stage"},
+{"id":"HB-131","d":1,"ev":"CEATEC","s":"10:00","e":"12:00","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-131","ko":"관람을 넘어 머무는 경험으로 · 스타디움과 아레나의 변신","en":"Beyond Just Watching: Transforming Stadiums and Arenas","who":"다나카 요이치(NTT도코모)","t":["AI 전환"]},
+{"id":"HB-132","d":1,"ev":"JOINT","s":"13:00","e":"13:45","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-132","ko":"자동차와 전자 업계 수장이 말하는 일본의 미래","en":"Toward Japan's Future Society","who":"사토 고지(자공회 회장·토요타 부회장), 니노 다카시(JEITA 회장·NEC 회장)","t":["AI 전환","모빌리티"],"pick":1},
+{"id":"HB-133","d":1,"ev":"CEATEC","s":"15:30","e":"16:15","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-133","ko":"지역의 미래 전략","en":"Advancing the Regional Future Strategy","who":"","t":["정책"]},
+{"id":"HA-132","d":1,"ev":"CEATEC","s":"12:00","e":"14:00","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-132","ko":"에이전틱 AI와 데이터 인프라 · 데이터 공유 생태계가 바꿀 경영","en":"The Future of Agentic AI and Data Infrastructure : Open Data Spaces for the AI-Native Enterprise","who":"","t":["AI 전환","데이터·클라우드"]},
+{"id":"HA-133","d":1,"ev":"CEATEC","s":"14:30","e":"15:30","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-133","ko":"첨단 반도체가 이끄는 산업 전환","en":"Industrial Transformation Driven by Cutting-Edge Semiconductors","who":"","t":["차세대 기술"]},
+{"id":"HA-134","d":1,"ev":"CEATEC","s":"16:00","e":"17:00","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-134","ko":"피지컬 AI, 일본은 어디서 이길 수 있나","en":"Industrial Competitiveness in Physical AI and Japan’s Winning Strategy","who":"야스카와전기, 시미즈건설, 도시바 CTO, NEC, 히타치 AI CoE, 내각부, 아라카와 야스히코(도쿄대)","t":["AI 전환","차세대 기술"]},
+{"id":"R2-132","d":1,"ev":"CEATEC","s":"12:00","e":"13:00","v":"201 회의실 (국제회의장 2F)","code":"R2-132","ko":"일본의 R&D와 혁신이 외면할 수 없는 다섯 가지 현실","en":"Five Hard Truths Shaping Japan’s R&D and Innovation Future","who":"리처드 시어(Everest Group)","t":["AI 전환","차세대 기술"]},
+{"id":"R2-131","d":1,"ev":"CEATEC","s":"10:30","e":"11:30","v":"201 회의실 (국제회의장 2F)","code":"R2-131","ko":"젊은 실무자가 보는 정보통신 산업의 미래","en":"The Future of the ICT Industry: Perspectives from Young Professionals (Tentative)","who":"모리카와 히로유키(CIAJ 회장)","t":["차세대 통신"]},
+{"id":"R2-133","d":1,"ev":"CEATEC","s":"13:30","e":"15:30","v":"201 회의실 (국제회의장 2F)","code":"R2-133","ko":"HCMI 심포지엄 · '최적화'에서 '재설계'로, AI·로봇과 일하는 질(QoW)","en":"HCMI Symposium: “From the Era of ‘Optimization’ to the Era of ‘Redesign’—AI, Robotics, and QoW”","who":"NEDO, 산업기술총합연구소(AIST), AIST Solutions","t":["AI 전환","서스테이너블"]},
+{"id":"R2-134","d":1,"ev":"CEATEC","s":"16:00","e":"17:15","v":"201 회의실 (국제회의장 2F)","code":"R2-134","ko":"AI 시대의 사이버보안 최신 동향","en":"The Cutting Edge of AI and Cybersecurity","who":"Nozomi Networks CEO, GMO 사이버시큐리티, NEC 시큐리티","t":["보안","AI 전환"]},
+{"id":"R3-131","d":1,"ev":"CEATEC","s":"10:30","e":"11:30","v":"301 회의실 (국제회의장 3F)","code":"R3-131","ko":"소프트웨어 정의(SDx)로 임베디드 기술부채 벗어나기","en":"Software Opens the Way to Embedded Transformation Escaping Technical Debt and the Software-Defined Prescription","who":"JEITA 소프트웨어 사업기반 전문위원회","t":["AI 전환","차세대 기술"]},
+{"id":"R3-132","d":1,"ev":"CEATEC","s":"12:00","e":"13:00","v":"301 회의실 (국제회의장 3F)","code":"R3-132","ko":"생성형 AI 활용 현황과 전망","en":"Current State and Future Outlook of Generative AI Utilization","who":"JEITA 소프트웨어 사업전략 전문위원회","t":["AI 전환"]},
+{"id":"R3-133","d":1,"ev":"CEATEC","s":"13:30","e":"14:30","v":"301 회의실 (국제회의장 3F)","code":"R3-133","ko":"'AI를 위한 네트워크'로 누가 돈을 벌까","en":"Who Will Capture Value from Network for AI?","who":"나카오 아키히로(도쿄대), NTT동일본, NAVER Cloud","t":["AI 전환","차세대 통신"]},
+{"id":"R3-134","d":1,"ev":"CEATEC","s":"14:45","e":"15:45","v":"301 회의실 (국제회의장 3F)","code":"R3-134","ko":"AI가 바꾸는 HR 산업 · 글로벌 HR 데카콘의 AI 활용 현장","en":"How AI Is Changing the HR Industry: Frontlines of AI Utilization by Global HR Decacorns","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"ES-131","d":1,"ev":"CEATEC","s":"10:30","e":"12:00","v":"E스테이지 (홀 8)","code":"ES-131","ko":"CEATEC 에코&디자인 챌린지 결선 발표","en":"CEATEC Eco & Design Challenge Final Presentation","who":"","t":[]},
+{"id":"ES-132","d":1,"ev":"CEATEC","s":"12:30","e":"13:30","v":"E스테이지 (홀 8)","code":"ES-132","ko":"일본 최대 2차 활용 의료정보 플랫폼이 여는 헬스케어","en":"Building the Future of Healthcare with Japan’s Largest PHR Platform Designed for Secondary Use","who":"","t":["데이터·클라우드","정책"]},
+{"id":"ES-133","d":1,"ev":"CEATEC","s":"14:00","e":"15:00","v":"E스테이지 (홀 8)","code":"ES-133","ko":"후쿠시마에서 실증하라 · 스타트업 테스트베드로서의 후쿠시마","en":"Start in Fukushima. Change the World. -Fukushima Innovation Coast Framework and F-REI: Opening New Frontiers for Startup Challenges-","who":"에무라 가쓰미(F-REI 이사), 호시카와 나오히사(오쿠마 다이아몬드 디바이스) 외","t":["스타트업·오픈이노베이션","정책"]},
+{"id":"ES-134","d":1,"ev":"CEATEC","s":"15:30","e":"16:30","v":"E스테이지 (홀 8)","code":"ES-134","ko":"일본형 GPS '미치비키'가 여는 미래와 활용 현장","en":"The future opened up by the Quasi-Zenith Satellite System \"Michibiki\" and the forefront of its utilization","who":"미카미 겐지(내각부 준천정위성시스템전략실장), 셉텐트리오","t":[]},
+{"id":"TS-131","d":1,"ev":"CEATEC","s":"11:00","e":"11:30","v":"T스테이지 (홀 6)","code":"TS-131","ko":"DMARC 'None'에서 'Reject'로 안전하게 넘어가는 법","en":"Beyond DMARC \"None\": A Practical Guide to Safely Transitioning to \"Reject\"","who":"","t":["보안"]},
+{"id":"TS-132","d":1,"ev":"CEATEC","s":"12:15","e":"13:15","v":"T스테이지 (홀 6)","code":"TS-132","ko":"JR동일본이 이끄는 WaaS 공동창출 컨소시엄과 웰빙 사회","en":"WaaS Co-Creation Consortium ～A Well-being Society Through the Open Innovation Consortium led by JR-East～","who":"","t":["스타트업·오픈이노베이션"]},
+{"id":"TS-133","d":1,"ev":"CEATEC","s":"13:30","e":"14:30","v":"T스테이지 (홀 6)","code":"TS-133","ko":"'동의'에 기대지 않는 AI·데이터 활용 · 오사카 엑스포에서 시작된 VPIA","en":"タイトル（英文） AI and Data Utilization Beyond “Consent” — VPIA Beginning with Expo 2025 and New Rules for Trusted Data Utilization in Society —","who":"","t":["데이터·클라우드","보안"]},
+{"id":"TS-134","d":1,"ev":"CEATEC","s":"14:45","e":"15:15","v":"T스테이지 (홀 6)","code":"TS-134","ko":"가전 데이터로 생활을 바꾸는 에디온의 IoT 생태계","en":"Turning Daily Convenience into Enriched Lifestyles: EDION's IoT Data Ecosystem and New Co-Creation Model","who":"효도 쓰요시(에디온)","t":["데이터·클라우드","스마트시티·홈"]},
+{"id":"TS-135","d":1,"ev":"CEATEC","s":"15:30","e":"17:00","v":"T스테이지 (홀 6)","code":"TS-135","ko":"방재 × IoT · 평소에도 비상시에도 안심","en":"Disaster Preparedness × IoT: Everyday Peace of Mind, Emergency Confidence","who":"","t":["스마트시티·홈"]},
+{"id":"XS-131","d":1,"ev":"CEATEC","s":"11:00","e":"12:00","v":"X스테이지 (홀 5)","code":"XS-131","ko":"국경 없는 인재 · 일본 기업의 인재 파이프라인 다시 짜기","en":"The Borderless Workforce: Rebuilding Japan’s Talent Pipeline ～Technology, Global Talent and the Future of Japanese Companies～","who":"","t":["스타트업·오픈이노베이션"]},
+{"id":"XS-132","d":1,"ev":"CEATEC","s":"12:15","e":"13:15","v":"X스테이지 (홀 5)","code":"XS-132","ko":"SOMPO가 그리는 지역 교통과 자율주행의 미래","en":"The Dawn of the Mobility Revolution: SOMPO Designs the Future of Local Transportation and Autonomous Driving","who":"손해보험재팬","t":["모빌리티","스타트업·오픈이노베이션"]},
+{"id":"XS-133","d":1,"ev":"CEATEC","s":"13:30","e":"14:30","v":"X스테이지 (홀 5)","code":"XS-133","ko":"대기업 신사업과 인재 전략 · 소니 애자일 조직 사례","en":"Driving Success in Corporate New Business & Modern Talent Strategies: A Sony Agile Organization Case Study","who":"","t":["차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"XS-134","d":1,"ev":"CEATEC","s":"14:45","e":"15:45","v":"X스테이지 (홀 5)","code":"XS-134","ko":"Beyond 5G/6G 기금 프로젝트로 보는 미래 · 비지상 네트워크(NTN) 특집","en":"Exploring the Future Society Enabled by the Innovative ICT Fund Projects for Beyond 5G/6G: A Special Feature on Non-Terrestrial Networks (NTN)","who":"","t":["차세대 통신"]},
+{"id":"XS-135","d":1,"ev":"CEATEC","s":"16:00","e":"17:00","v":"X스테이지 (홀 5)","code":"XS-135","ko":"피지컬 AI를 현장에 뿌리내리게 하는 데이터와 공동창출","en":"Grounding Physical AI: How Data and Co-Creation Drive Deployment","who":"","t":["AI 전환","차세대 기술"]},
+{"id":"PS-1301","d":1,"ev":"CEATEC","s":"10:30","e":"10:45","v":"P스테이지 (홀 4)","code":"PS-1301","ko":"AI 혁신 인텔리전스로 신사업 창출 앞당기기","en":"From Ideas to Impact: How AI-Powered Innovation Intelligence Accelerates New Business Creation","who":"","t":["AI 전환","차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"PS-1302","d":1,"ev":"CEATEC","s":"10:45","e":"11:00","v":"P스테이지 (홀 4)","code":"PS-1302","ko":"야외의 순간을 이야기로 남기는 AI 웨어러블 'Souvi'","en":"Souvi: An AI Wearable That Turns Outdoor Moments into Lasting Stories","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"PS-1303","d":1,"ev":"CEATEC","s":"11:00","e":"11:15","v":"P스테이지 (홀 4)","code":"PS-1303","ko":"제로트러스트 IoT(ZT-IoT) 프로젝트","en":"ZT-IoT project","who":"","t":["스마트시티·홈","보안"]},
+{"id":"PS-1304","d":1,"ev":"CEATEC","s":"11:15","e":"11:30","v":"P스테이지 (홀 4)","code":"PS-1304","ko":"탈탄소를 수익으로 바꾸는 AI GX 매니저","en":"AI-Powered GX: From Decarbonization to Revenue Your AI Manager for Corporate GX","who":"","t":["AI 전환","데이터·클라우드"]},
+{"id":"PS-1305","d":1,"ev":"CEATEC","s":"11:30","e":"11:45","v":"P스테이지 (홀 4)","code":"PS-1305","ko":"업무 프로세스 인터뷰, 아직도 사람이 하나요","en":"Are you still running process interviews manually?","who":"","t":["AI 전환","데이터·클라우드"]},
+{"id":"PS-1307","d":1,"ev":"CEATEC","s":"12:00","e":"12:15","v":"P스테이지 (홀 4)","code":"PS-1307","ko":"누구나 소량 다품종 맞춤형 반도체를 만드는 LDIC","en":"LDIC Enables Anyone to Create Custom ICs in Small Volumes and Extensive Varieties","who":"","t":["전자부품·반도체","스타트업·오픈이노베이션"]},
+{"id":"PS-1308","d":1,"ev":"CEATEC","s":"12:15","e":"12:30","v":"P스테이지 (홀 4)","code":"PS-1308","ko":"중소기업·스타트업을 위한 AI 보조금 모니터링","en":"AI-Powered Subsidy Monitoring for SMEs and Startups","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"PS-1311","d":1,"ev":"CEATEC","s":"13:00","e":"14:30","v":"P스테이지 (홀 4)","code":"PS-1311","ko":"함께 만드는 접근성 높은 도시 · TMIP 접근성 서클","en":"Co-Creating Accessible Cities - The TMIP Accessibility Circle in Action","who":"","t":["스타트업·오픈이노베이션","서스테이너블"]},
+{"id":"PS-1319","d":1,"ev":"CEATEC","s":"15:00","e":"15:30","v":"P스테이지 (홀 4)","code":"PS-1319","ko":"UAE 피치 · 지속가능성을 위한 차세대 기술","en":"UAE Pitch: Next-Generation Technologies for Sustainability","who":"","t":["그린·에너지","서스테이너블"]},
+{"id":"PS-1320","d":1,"ev":"CEATEC","s":"15:30","e":"16:00","v":"P스테이지 (홀 4)","code":"PS-1320","ko":"UAE 피치 · 디지털 세계를 바꾸는 첨단 기술","en":"UAE Pitch: Advanced Technologies Transforming the Digital World","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"PS-1321","d":1,"ev":"CEATEC","s":"16:00","e":"16:30","v":"P스테이지 (홀 4)","code":"PS-1321","ko":"UAE 피치 · 사람과 비즈니스를 돕는 혁신","en":"UAE Pitch: Innovation Empowering People and Business","who":"","t":["차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"HB-141","d":2,"ev":"CEATEC","s":"10:00","e":"11:00","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-141","ko":"모빌리티 × 웰빙 · 이동의 가치를 다시 정의하는 생태계","en":"Mobility × Well-being: A New Ecosystem for Redefining the Value of Movement","who":"","t":["모빌리티","스마트시티·홈"]},
+{"id":"HB-142","d":2,"ev":"CEATEC","s":"11:30","e":"12:30","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-142","ko":"피지컬 AI 시대의 HMI와 디스플레이 · 자동차에서 로봇까지","en":"HMI and Displays in the Era of Physical AI―Experience Design Expanding from Mobility to Robotics―","who":"노베 쓰구오(나고야대 모빌리티사회연구소) 외","t":["AI 전환","모빌리티"]},
+{"id":"HB-143","d":2,"ev":"CEATEC","s":"13:00","e":"14:00","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-143","ko":"'실패'와 '도전'으로 보는 AI 사회","en":"The AI Society from the Perspectives of “Failure” and “Challenge”~The Message Behind “I Never Fail”~","who":"","t":["AI 전환"]},
+{"id":"HB-144","d":2,"ev":"CEATEC","s":"14:30","e":"15:30","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-144","ko":"기업 R&D에 왜 지금 크리에이티브가 필요한가 · 덴쓰 랩 도쿄의 '플레이풀 솔루션'","en":"Why Creativity is Crucial for Today’s Corporate R&D — What is Dentsu Lab Tokyo’s \"Playful Solution\"?","who":"덴쓰 랩 도쿄","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"HB-145","d":2,"ev":"CEATEC","s":"16:00","e":"17:30","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-145","ko":"AI 홈 시대의 시작 · Matter와 Aliro가 여는 차세대 스마트홈","en":"Dawn of the AI Home Era: Next-Generation Smart Homes Enabled by Matter and Aliro","who":"토빈 리처드슨(Connectivity Standards Alliance CEO), 파나소닉, YKK AP","t":["AI 전환","스마트시티·홈"]},
+{"id":"HA-141","d":2,"ev":"CEATEC","s":"10:00","e":"11:45","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-141","ko":"6G×AI ① AI 시대 정보통신 성장 전략","en":"Information and Communications Growth Strategy in the AI Era","who":"니노 다카시(JEITA 회장), 나카오 아키히로(도쿄대·XGMF), 총무성, 이동통신 4사","t":["AI 전환","차세대 통신"]},
+{"id":"HA-142","d":2,"ev":"CEATEC","s":"12:00","e":"13:05","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-142","ko":"6G×AI ② 왜 6G인가 · 6G가 그리는 미래와 새로운 가치","en":"Why 6G : Shaping the Future Society and Creating New Value","who":"나카무라 다케히로(XGMF 6G 추진 프로젝트 리더)","t":["차세대 통신","차세대 기술"]},
+{"id":"HA-143","d":2,"ev":"CEATEC","s":"13:20","e":"14:50","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-143","ko":"6G×AI ③ AI 네이티브 6G · 통신과 AI의 융합","en":"AI-Native 6G : Building Intelligent Communication Infrastructure through the Convergence of AI and Communications","who":"","t":["AI 전환","차세대 통신"]},
+{"id":"HA-144","d":2,"ev":"CEATEC","s":"15:10","e":"16:30","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-144","ko":"6G×AI ④ 비지상 네트워크(NTN) · 6G 시대 어디서나 연결","en":"NTN：Pioneering Ubiquitous Connectivity in the 6G Era","who":"도요시마 모리오(NICT) 외","t":["차세대 통신","차세대 기술"]},
+{"id":"R2-141","d":2,"ev":"CEATEC","s":"10:00","e":"11:00","v":"201 회의실 (국제회의장 2F)","code":"R2-141","ko":"재난 때 빛나는 휴대용 전원과 전기차 급전 · 재택의료 활용","en":"From Disaster Realities to a Connected Medical Infrastructure: New Options for Home Healthcare Enabled by Portable Power and EV-Based Energy Supply","who":"JEITA 헬스케어부회, 국토교통성","t":["모빌리티","그린·에너지"]},
+{"id":"R2-143","d":2,"ev":"CEATEC","s":"12:30","e":"13:30","v":"201 회의실 (국제회의장 2F)","code":"R2-143","ko":"VR로 바꾸는 설비 유지보수","en":"Transforming Maintenance with Virtual Reality Technology","who":"","t":["AI 전환","데이터·클라우드"]},
+{"id":"R2-144","d":2,"ev":"CEATEC","s":"14:00","e":"15:00","v":"201 회의실 (국제회의장 2F)","code":"R2-144","ko":"블루투스의 큰 진화 · 고속 전송(HDT) 집중 해부","en":"Major Enhancements in Bluetooth®: Spotlight on High Data Throughput (HDT)","who":"Bluetooth SIG","t":["차세대 통신","차세대 기술"]},
+{"id":"R2-145","d":2,"ev":"CEATEC","s":"15:30","e":"16:30","v":"201 회의실 (국제회의장 2F)","code":"R2-145","ko":"에이전틱 AI 시대의 생태계 간 데이터 공유 · DID/VC와 생체인증","en":"Cross-Ecosystem Data Sharing — DID/VC & Biometrics in the Agentic AI Era","who":"","t":["AI 전환","데이터·클라우드"]},
+{"id":"R3-141","d":2,"ev":"CEATEC","s":"10:00","e":"11:00","v":"301 회의실 (국제회의장 3F)","code":"R3-141","ko":"탄소 감축 데이터를 돈이 되게 만드는 법","en":"Toward Green Growth by Monetizing Environmental Activity Data","who":"Green x Digital 컨소시엄, 후지전기 GX전략실","t":["그린·에너지","서스테이너블"]},
+{"id":"R3-143","d":2,"ev":"CEATEC","s":"13:00","e":"16:00","v":"301 회의실 (국제회의장 3F)","code":"R3-143","ko":"NEDO 세미나 · 차세대 디지털 인프라 기술","en":"NEDO Seminar: Beyond a Connected Future – Advanced Infrastructure Technologies Enabling Next-Generation Digital Platforms –","who":"마스다 스스무(NEDO 이사), 키옥시아, 1Finity, 라쿠텐모바일","t":["차세대 통신","정책"]},
+{"id":"ES-1401","d":2,"ev":"CEATEC","s":"10:15","e":"10:50","v":"E스테이지 (홀 8)","code":"ES-1401","ko":"인구 이동 데이터로 지역 문제 풀기","en":"Leveraging Human Mobility Data to Address Local Challenges","who":"","t":[]},
+{"id":"ES-1402","d":2,"ev":"CEATEC","s":"10:50","e":"11:05","v":"E스테이지 (홀 8)","code":"ES-1402","ko":"위치 데이터를 해법으로 · 분석과 현장을 잇는 인재 키우기","en":"Turning Location Data into Solutions: Developing Professionals Who Bridge Data Analysis and Practice","who":"","t":["데이터·클라우드","모빌리티"]},
+{"id":"ES-1403","d":2,"ev":"CEATEC","s":"11:05","e":"11:25","v":"E스테이지 (홀 8)","code":"ES-1403","ko":"상용차 50만 대 데이터로 짜는 지역·도로 정책","en":"Using one of Japan’s largest datasets of 500,000 commercial vehicles for regional and road policy: Infrastructure development based on actual logistics conditions","who":"","t":["데이터·클라우드","모빌리티"]},
+{"id":"ES-1404","d":2,"ev":"CEATEC","s":"11:25","e":"11:40","v":"E스테이지 (홀 8)","code":"ES-1404","ko":"지도에서 인텔리전스로 · AI가 쓸 수 있는 공간 데이터","en":"From Maps to Intelligence: Creating Real-World Insights and AI-Consumable Data","who":"","t":["AI 전환","차세대 기술"]},
+{"id":"ES-1405","d":2,"ev":"CEATEC","s":"11:40","e":"12:00","v":"E스테이지 (홀 8)","code":"ES-1405","ko":"전기차 충전 인프라 · 위치 데이터와 행동 분석","en":"EV Infrastructure : Location Data & Behavioral Analytics","who":"","t":["데이터·클라우드","모빌리티"]},
+{"id":"ES-1406","d":2,"ev":"CEATEC","s":"12:00","e":"12:15","v":"E스테이지 (홀 8)","code":"ES-1406","ko":"도시 공간 텔레매틱스의 미래","en":"The Future of Telematics in Urban Spaces","who":"","t":["데이터·클라우드","모빌리티"]},
+{"id":"ES-1407","d":2,"ev":"CEATEC","s":"12:15","e":"12:35","v":"E스테이지 (홀 8)","code":"ES-1407","ko":"위치정보 비즈니스 입문","en":"A Guide to the Location Intelligence Business","who":"","t":["AI 전환","데이터·클라우드"]},
+{"id":"ES-1408","d":2,"ev":"CEATEC","s":"12:35","e":"12:50","v":"E스테이지 (홀 8)","code":"ES-1408","ko":"수기 보고서를 넘어 · 산업 현장 위치 데이터로 인력·자재 관리 자동화","en":"Beyond Handwritten Reports: How Industrial Location Data Automatically Transforms Workforce and Materials Data into Valuable Assets","who":"","t":["데이터·클라우드"]},
+{"id":"ES-1410","d":2,"ev":"CEATEC","s":"13:10","e":"13:25","v":"E스테이지 (홀 8)","code":"ES-1410","ko":"데이터보다 맥락 · 유동인구 분석에 성공하는 법 (15분 토크)","en":"Data & Processing Are Costs; Context Drives Results - A 15-Minute Short Talk on Successful People Flow Analytics -","who":"","t":["데이터·클라우드","스마트시티·홈"]},
+{"id":"ES-1411","d":2,"ev":"CEATEC","s":"13:25","e":"13:45","v":"E스테이지 (홀 8)","code":"ES-1411","ko":"직원의 암묵지를 담아야 기업 AI가 움직인다","en":"TACIT Knowledge, Real Results: How Capturing What Employees Know Unblocks Enterprise AI in Japan","who":"","t":["AI 전환","보안"]},
+{"id":"ES-1412","d":2,"ev":"CEATEC","s":"13:45","e":"14:00","v":"E스테이지 (홀 8)","code":"ES-1412","ko":"소프트뱅크의 고정밀 측위 사업 소개","en":"Introduction to SoftBank's High-Precision Positioning Initiatives","who":"","t":["데이터·클라우드","모빌리티"]},
+{"id":"ES-1413","d":2,"ev":"CEATEC","s":"14:00","e":"14:20","v":"E스테이지 (홀 8)","code":"ES-1413","ko":"경쟁 매장 유동인구를 보는 실전 상권 분석","en":"Visualizing Competitor Foot Traffic: Real Trading Area Analysis with People Flow Data","who":"","t":["AI 전환"]},
+{"id":"ES-1414","d":2,"ev":"CEATEC","s":"14:20","e":"14:35","v":"E스테이지 (홀 8)","code":"ES-1414","ko":"지도로 여는 AI 시대 의사결정 · 마푸루 사례","en":"Decision-Making Innovation in the AI Era, Unlocked by Maps: MAPPLE’s Case Study and Outlook on Avoiding the Risk of Failure","who":"","t":["AI 전환","데이터·클라우드"]},
+{"id":"ES-1416","d":2,"ev":"CEATEC","s":"14:55","e":"15:10","v":"E스테이지 (홀 8)","code":"ES-1416","ko":"위치 데이터 업계 U-35의 도전","en":"Connecting Now, Changing the Next Decade: The U-35 Challenge in the Location Data Industry","who":"","t":["스타트업·오픈이노베이션"]},
+{"id":"ES-1417","d":2,"ev":"CEATEC","s":"15:10","e":"15:30","v":"E스테이지 (홀 8)","code":"ES-1417","ko":"LBMA × 지오스페이셜 엑스포 · 위치 기반 비즈니스의 새 가능성","en":"Exploring New Possibilities for Location-Based Business at LBMA × Geospatial EXPO","who":"","t":["차세대 기술"]},
+{"id":"ES-1418","d":2,"ev":"CEATEC","s":"15:30","e":"15:50","v":"E스테이지 (홀 8)","code":"ES-1418","ko":"마지막 미개척지 실내 공간 · 자산으로서의 공간 데이터","en":"Indoors, the Last Uncharted Territory: Spatial Data as an Asset, Beyond Location","who":"","t":["데이터·클라우드","스타트업·오픈이노베이션"]},
+{"id":"ES-1419","d":2,"ev":"CEATEC","s":"15:50","e":"16:15","v":"E스테이지 (홀 8)","code":"ES-1419","ko":"공동창출과 AI로 여는 지리공간 인텔리전스","en":"Unlocking the Future of Geospatial Intelligence through Co-Creation & AI","who":"","t":["AI 전환","데이터·클라우드"]},
+{"id":"TS-142","d":2,"ev":"CEATEC","s":"11:15","e":"12:45","v":"T스테이지 (홀 6)","code":"TS-142","ko":"요즘 반도체가 뜨거운 이유 · 사회와 일자리를 바꾸는 반도체","en":"The Semiconductor Industry: Gaining Momentum — How Semiconductors Are Changing Society and Connecting Learning to Work —","who":"레조낙 첨단융합연구소, 캐논, 르네사스, 도쿄과학대","t":["전자부품·반도체","정책"]},
+{"id":"TS-143","d":2,"ev":"CEATEC","s":"13:00","e":"14:00","v":"T스테이지 (홀 6)","code":"TS-143","ko":"연구와 기술은 왜 큰 사업이 되지 못할까 · 사업화를 가르는 '시장' 관점","en":"Why Do Research and Technology Fail to Lead to Major Business Ventures? — Understanding the \"Market\" Perspective That Determines Commercialization Success: Insights from Case Studies —","who":"","t":["스타트업·오픈이노베이션","정책"]},
+{"id":"TS-144","d":2,"ev":"CEATEC","s":"14:15","e":"15:15","v":"T스테이지 (홀 6)","code":"TS-144","ko":"IoT 보안 인증 JC-STAR의 현재와 미래","en":"JC-STAR: The State and Future of IoT Cybersecurity.","who":"경제산업성, IPA, 에디온, 파나소닉","t":["스마트시티·홈","보안"]},
+{"id":"TS-145","d":2,"ev":"CEATEC","s":"15:30","e":"17:00","v":"T스테이지 (홀 6)","code":"TS-145","ko":"차세대 인재 크로스토크","en":"Next Generation Human Resources Crosstalk","who":"와카바야시 히데키(구마모토대) 외","t":["전자부품·반도체"]},
+{"id":"XS-141","d":2,"ev":"CEATEC","s":"10:30","e":"11:30","v":"X스테이지 (홀 5)","code":"XS-141","ko":"LLM에서 피지컬 AI까지 · 프리퍼드 네트웍스 PLaMo 기반 기업 AI 도입","en":"From LLMs to Physical AI: Trends in AI Implementation for Enterprise Operations and Preferred Networks’ Solutions Built Around PLaMo","who":"프리퍼드 네트웍스","t":["AI 전환","데이터·클라우드"]},
+{"id":"XS-142","d":2,"ev":"CEATEC","s":"11:45","e":"12:45","v":"X스테이지 (홀 5)","code":"XS-142","ko":"바다를 지키면서 지역이 돈을 벌 수 있을까 · 우와카이 스마트 수산 밸리","en":"Can Protecting the Sea Generate Local Revenue? — Regional Coastal Smart Environment & Fisheries Valley Initiative","who":"","t":["차세대 기술","서스테이너블"]},
+{"id":"PS-1405","d":2,"ev":"CEATEC","s":"11:30","e":"11:45","v":"P스테이지 (홀 4)","code":"PS-1405","ko":"해외 진출 마케팅·영업을 위한 통합 컴플라이언스 eCAP","en":"Focus on Winning Business Worldwide. eCAP - Integrated Compliance for Marketing, Sales and Market Expansion","who":"","t":["AI 전환","보안"]},
+{"id":"PS-1406","d":2,"ev":"CEATEC","s":"11:45","e":"12:00","v":"P스테이지 (홀 4)","code":"PS-1406","ko":"J:COM R&D가 그리는 차세대 네트워크","en":"The Future of Next‑Generation Networks by J:COM R&D","who":"","t":["AI 전환","차세대 통신"]},
+{"id":"PS-1410","d":2,"ev":"CEATEC","s":"12:45","e":"13:00","v":"P스테이지 (홀 4)","code":"PS-1410","ko":"도시를 물들이며 발전하는 컬러 태양전지","en":"Color the City, Generate Energy: Colored Solar Cells for Urban Landscapes","who":"","t":["그린·에너지","스타트업·오픈이노베이션"]},
+{"id":"PS-1411","d":2,"ev":"CEATEC","s":"13:00","e":"13:40","v":"P스테이지 (홀 4)","code":"PS-1411","ko":"첨단기술 × 제조업이 만드는 새 산업의 현실","en":"The Reality of New Industries Created by \"Advanced Tech × Manufacturing\": The Path to Social Implementation for Societal Challenges","who":"","t":["차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"PS-1417","d":2,"ev":"CEATEC","s":"14:30","e":"14:45","v":"P스테이지 (홀 4)","code":"PS-1417","ko":"JAEA의 차세대 고속 VR 가시화와 유체 계산 기술","en":"Introduction to JAEA’s Next-Generation High-Speed VR Visualization Technology and High-Speed Fluid Computing","who":"","t":["데이터·클라우드","차세대 기술"]},
+{"id":"PS-1418","d":2,"ev":"CEATEC","s":"14:45","e":"15:00","v":"P스테이지 (홀 4)","code":"PS-1418","ko":"아무도 재지 않은 가치를 AI와 데이터로 찾기","en":"Uncovering the Value No One Has Measured Yet — with AI and Data","who":"","t":["AI 전환","서스테이너블"]},
+{"id":"PS-1419","d":2,"ev":"CEATEC","s":"15:00","e":"15:30","v":"P스테이지 (홀 4)","code":"PS-1419","ko":"라트비아의 AI 혁신 · 산업 전환과 자동화","en":"\"Latvia's AI Innovations: Transforming Industries & Automating the Future","who":"","t":["AI 전환"]},
+{"id":"PS-1420","d":2,"ev":"CEATEC","s":"15:30","e":"16:00","v":"P스테이지 (홀 4)","code":"PS-1420","ko":"회복력 있고 포용적인 사회를 위한 EU 디지털 솔루션 (1)","en":"EU Digital Solutions for a Resilient and Inclusive Society (1)","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"PS-1421","d":2,"ev":"CEATEC","s":"16:00","e":"16:30","v":"P스테이지 (홀 4)","code":"PS-1421","ko":"회복력 있고 포용적인 사회를 위한 EU 디지털 솔루션 (2)","en":"EU Digital Solutions for a Resilient and Inclusive Society (2)","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"HB-151","d":3,"ev":"CEATEC","s":"10:00","e":"11:00","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-151","ko":"AI 시대 경쟁력은 데이터가 좌우한다 · 시오노기의 데이터 거버넌스 여정","en":"In the AI Era, Competitive Advantage Depends on Data – SHIONOGI’s Journey to Maximize AI Value through Data Governance, Master Data Transformation, and Context Engineering –","who":"","t":["AI 전환","데이터·클라우드"]},
+{"id":"HB-152","d":3,"ev":"CEATEC","s":"11:30","e":"12:30","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-152","ko":"현장 문제에서 출발한 스마트 농업","en":"Agriculture evolving digitally: Smart agriculture pioneered by interdisciplinary technologies starting from on-site challenges.","who":"","t":["차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"HB-153","d":3,"ev":"CEATEC","s":"13:00","e":"14:00","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-153","ko":"AI for Science · AI 시대 일본의 과학 주권과 차세대 연구 인프라","en":"Building Japan’s Scientific Sovereign Edge in the AI Era AI for Science: Transforming Scientific Discovery & Next-Gen Research Infrastructure","who":"","t":["AI 전환","차세대 기술"]},
+{"id":"HB-154","d":3,"ev":"CEATEC","s":"14:30","e":"16:00","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-154","ko":"AI 시대, 산업 데이터를 연결하면 생기는 가치","en":"The Value and Future of Connected Industrial Data in the AI Era","who":"디지털청, 정보처리추진기구(IPA), 경제산업성","t":["AI 전환","데이터·클라우드"]},
+{"id":"HB-155","d":3,"ev":"CEATEC","s":"16:30","e":"17:30","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-155","ko":"일본 바다에 '블루 실리콘밸리'를 만들 수 있을까","en":"Can a 'Blue Silicon Valley' be created in Japan's seas?","who":"고치은행, 교쿠요, 스파크스 자산운용 외","t":["스타트업·오픈이노베이션","서스테이너블"]},
+{"id":"HA-151","d":3,"ev":"CEATEC","s":"10:00","e":"11:00","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-151","ko":"자율주행 시대의 차세대 ITS 통신과 지역 모빌리티 생태계","en":"Autonomous Driving–Era “Next‑Generation ITS Communications” and Future Mobility Creating a Regional Ecosystem","who":"가토 신페이(티어포 CEO), 시가 도시유키(다이내믹맵플랫폼), 오야마 리카(ONBOARD)","t":["모빌리티","차세대 통신"]},
+{"id":"HA-152","d":3,"ev":"CEATEC","s":"11:15","e":"12:10","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-152","ko":"Z세대 통신업계·총무성 리더가 말하는 6G 시대 성장 전략","en":"Growth Strategies for Japan’s ICT Sector Discussed by Gen‑Z Leaders from the Telecom Industry and the Ministry of Internal Affairs and Communications – A Digital‑Native Vision for the 6G Era","who":"","t":["차세대 통신","차세대 기술"]},
+{"id":"HA-153","d":3,"ev":"CEATEC","s":"12:20","e":"13:20","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-153","ko":"덕질 × 차세대 통신 · 경기장과 공연장의 새로운 경험","en":"OSHIKATSU x Next-Generation Communication～Challenges and Experience Creation in Stadiums and Live Venues from the Perspective of Fans and Behind-the-Scenes Teams～","who":"Oshicoco, 소니와이어리스커뮤니케이션즈, 무라타제작소","t":["차세대 통신","차세대 기술"]},
+{"id":"HA-154","d":3,"ev":"CEATEC","s":"13:35","e":"14:30","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-154","ko":"6G 시대 스타트업과 공동창출의 역할","en":"The Role of Startups and Co-Creation in the 6G Era","who":"하라다 히로시(교토대·XGMF 부대표)","t":["차세대 통신","스타트업·오픈이노베이션"]},
+{"id":"R2-151","d":3,"ev":"CEATEC","s":"10:30","e":"11:30","v":"201 회의실 (국제회의장 2F)","code":"R2-151","ko":"JEITA 모빌리티 포럼 · 대만이 제안하는 일본 모빌리티","en":"JEITA Mobility Forum: Proposals from Taiwan for Japan's Mobility Society (Tentative)","who":"대만 차량기술발전협회(TADA), Kingwaytek, Turing Drive 등","t":["AI 전환","모빌리티"]},
+{"id":"R2-152","d":3,"ev":"CEATEC","s":"11:45","e":"12:45","v":"201 회의실 (국제회의장 2F)","code":"R2-152","ko":"JEITA 모빌리티 포럼 · 사람 중심으로 다시 짜는 이동과 생활공간","en":"JEITA Mobility Forum: The Future of Mobility and Living Spaces through Human-Centered Transformation","who":"","t":["AI 전환","모빌리티"]},
+{"id":"R2-153","d":3,"ev":"CEATEC","s":"13:00","e":"14:00","v":"201 회의실 (국제회의장 2F)","code":"R2-153","ko":"모빌리티를 떠받치는 '보이지 않는 주역' · 차량용 전자부품","en":"The “Invisible Heroes” Powering the Future of Mobility","who":"야마모토 마사요시(나고야대 교수) 외","t":["모빌리티","전자부품·반도체"],"pick":1},
+{"id":"R2-154","d":3,"ev":"CEATEC","s":"14:15","e":"15:15","v":"201 회의실 (국제회의장 2F)","code":"R2-154","ko":"모빌리티 산업의 DX 전략과 SDV의 앞날","en":"DX Strategy and SDV to Pioneer the Future of the Mobility Industry: The Road Ahead","who":"구로야부 마코토(경제산업성 모빌리티DX실장), 사카구치 게이(도쿄과학대 교수)","t":["AI 전환","모빌리티"]},
+{"id":"R2-155","d":3,"ev":"CEATEC","s":"15:30","e":"16:30","v":"201 회의실 (국제회의장 2F)","code":"R2-155","ko":"기술은 있는데 왜 사업이 안 될까 · 연구 사업화의 벽과 돌파구","en":"The technology exists. Why doesn't it translate into a business? — Commercializing Research and Technology: Barriers and Breakthroughs —","who":"","t":["스타트업·오픈이노베이션","정책"]},
+{"id":"R3-151","d":3,"ev":"CEATEC","s":"10:00","e":"11:00","v":"301 회의실 (국제회의장 3F)","code":"R3-151","ko":"헬스케어 AI·DX 최신 동향과 분야 간 협업","en":"Latest Trends in Healthcare AI and DX: Domestic and International Case Studies and the Potential for Cross-Sector Collaboration","who":"JEITA 헬스케어 IT 연구회","t":["AI 전환","스마트시티·홈"]},
+{"id":"R3-152","d":3,"ev":"CEATEC","s":"11:15","e":"12:15","v":"301 회의실 (국제회의장 3F)","code":"R3-152","ko":"솔루션 서비스 시장 동향과 AI 활용, '데이터 어웨어 프레임워크'","en":"Solution Service Market Trends, AI Integration, and the \"Data-Aware Framework\"","who":"JEITA 솔루션서비스 사업위원회","t":["AI 전환","데이터·클라우드"]},
+{"id":"R3-153","d":3,"ev":"CEATEC","s":"12:30","e":"13:30","v":"301 회의실 (국제회의장 3F)","code":"R3-153","ko":"공장 보안 가이드라인 실전 · 수립에서 운영까지","en":"Putting the Security Guideline for Factories into Practice – From Security Planning to Operation: Building Continuous Security Improvement –","who":"JEITA 사이버피지컬 보안 전문위원회","t":["보안"]},
+{"id":"R3-154","d":3,"ev":"CEATEC","s":"13:45","e":"14:45","v":"301 회의실 (국제회의장 3F)","code":"R3-154","ko":"디지털로 되살리는 슈리성 복원","en":"Shuri Castle Reconstruction in the Digital Age Preserving History and Culture, Creating Social Value for the Future","who":"","t":["서스테이너블","정책"]},
+{"id":"R3-155","d":3,"ev":"CEATEC","s":"15:00","e":"16:00","v":"301 회의실 (국제회의장 3F)","code":"R3-155","ko":"우주 공동창출 파빌리온 특별세션 · Society 5.0을 향한 우주 기술","en":"Space Co-Creation Pavilion Special Session: \"Space Technologies and the Future Outlook Toward Society 5.0\"","who":"","t":["차세대 기술","정책"]},
+{"id":"R3-156","d":3,"ev":"CEATEC","s":"16:15","e":"17:15","v":"301 회의실 (국제회의장 3F)","code":"R3-156","ko":"AI 시대 대기업 신사업의 '2라운드' · 100여 건 지원에서 얻은 과제","en":"A New Trends in the AI Era: What is the ”Second Round” of Corporate New Business? - Next Key Agendas: Insights from 100+ Engagements -","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"ES-151","d":3,"ev":"CEATEC","s":"10:15","e":"11:15","v":"E스테이지 (홀 8)","code":"ES-151","ko":"보안도 성능도 타협 없이 · 픽스타즈 Vega로 하는 AI 기반 소프트웨어 개발","en":"No Compromise on Security or Performance — Secure AI-driven Software Development with Fixstars Vega","who":"마루오카 아키라(픽스타즈)","t":["AI 전환","데이터·클라우드"]},
+{"id":"ES-152","d":3,"ev":"CEATEC","s":"11:30","e":"12:30","v":"E스테이지 (홀 8)","code":"ES-152","ko":"CES 제대로 활용하기 · JAPAN TECH 출전사의 해외 전시회 뒷이야기","en":"How to Maximize Your CES Experience: Insights from JAPAN TECH Exhibitors - Behind the Scenes of International Trade Shows -","who":"기노시타 다카히로(지칸테크노), 도쿄과학대","t":["스타트업·오픈이노베이션","정책"]},
+{"id":"ES-153","d":3,"ev":"CEATEC","s":"12:45","e":"13:45","v":"E스테이지 (홀 8)","code":"ES-153","ko":"AI 도입의 빈틈을 메우는 조감 분석","en":"Mind the AI Gap: A High-Level Analytical Approach","who":"야마구치 미키오(VALUENEX)","t":["AI 전환","차세대 기술"]},
+{"id":"ES-154","d":3,"ev":"CEATEC","s":"14:00","e":"15:00","v":"E스테이지 (홀 8)","code":"ES-154","ko":"안리쓰의 계측 기술과 제약 제조의 미래 · 정제 전수검사 장비 Ariphas","en":"The Evolution of Anritsu’s Measurement Technologies and the Future of Pharmaceutical Manufacturing — Ariphas: The World’s First Transmission NIR System for 100% Tablet Inspection —","who":"안리쓰","t":["AI 전환","차세대 기술"]},
+{"id":"ES-155","d":3,"ev":"CEATEC","s":"15:15","e":"16:15","v":"E스테이지 (홀 8)","code":"ES-155","ko":"엣지 AI가 이머시브 공연 무대에 서다","en":"The Show Must Go On: When Edge AI Takes the Stage in Immersive Theater","who":"아리엘 이노베이션즈","t":["AI 전환"]},
+{"id":"TS-150","d":3,"ev":"CEATEC","s":"10:30","e":"11:50","v":"T스테이지 (홀 6)","code":"TS-150","ko":"신뢰를 설계하다 · AI 사회를 위한 IPA 로드맵","en":"Trust by Design: IPA's Roadmap for the AI-Powered Society","who":"","t":["AI 전환"]},
+{"id":"TS-151","d":3,"ev":"CEATEC","s":"12:00","e":"12:45","v":"T스테이지 (홀 6)","code":"TS-151","ko":"AI 전환(AX) 인재를 위한 IPA의 비전과 정책","en":"Skills Power the Nation: IPA’s Vision and Initiatives for the AX Talent of Tomorrow","who":"","t":["AI 전환"]},
+{"id":"TS-152","d":3,"ev":"CEATEC","s":"13:30","e":"14:30","v":"T스테이지 (홀 6)","code":"TS-152","ko":"연봉 3천만 엔 직무 'FDE' · 구마모토 지진 대응에서 본 현장 배치형 엔지니어","en":"Leading the AI Era: The ¥30 Million Role of Forward Deployed Engineers (FDE) — How the FDE Team Rose to the Challenge in the Reiwa 8 Kumamoto Earthquake","who":"","t":["AI 전환","차세대 기술"]},
+{"id":"TS-153","d":3,"ev":"CEATEC","s":"14:45","e":"15:45","v":"T스테이지 (홀 6)","code":"TS-153","ko":"HCMI 세미나 · '대체'에서 '가치 창출'로, 사람·AI·로봇의 공동창조","en":"HCMI Seminar: Toward a Future of Human-AI-Robot Co-Creation From “Replacement” to “Value Creation”: Developing RX (Robotics Transformation) Leaders and Quality of Working (QoW) Management","who":"","t":["AI 전환"]},
+{"id":"TS-154","d":3,"ev":"CEATEC","s":"16:00","e":"17:15","v":"T스테이지 (홀 6)","code":"TS-154","ko":"차세대 인재가 여는 바다의 미래 · Blue-Shrimp Summit","en":"【Next-Gen Talent. Ocean Future.】 Blue-Shrimp Summit.","who":"","t":["스타트업·오픈이노베이션"]},
+{"id":"XS-152","d":3,"ev":"CEATEC","s":"12:15","e":"13:15","v":"X스테이지 (홀 5)","code":"XS-152","ko":"공공조달로 스타트업 키우기 · EU와 일본의 시각","en":"Innovation Procurement: Supporting Startups through Public Procurement - Panel Discussion with EU-Japan Perspectives","who":"","t":["스타트업·오픈이노베이션","정책"]},
+{"id":"XS-153","d":3,"ev":"CEATEC","s":"13:30","e":"14:30","v":"X스테이지 (홀 5)","code":"XS-153","ko":"사이버-피지컬 차세대 경제와 '신체성 인터버스' 기술","en":"The Cyber-Physical Next-Gen Economy & the Future of 'Physical Interverse Technology'","who":"모치마루 마사아키(AIST 펠로)","t":["AI 전환","정책"]},
+{"id":"XS-154","d":3,"ev":"CEATEC","s":"14:45","e":"15:45","v":"X스테이지 (홀 5)","code":"XS-154","ko":"광섬유망으로 일본 표준시를 정밀하고 안정적으로 전달하기","en":"High-Precision, Resilient Delivery of Japan Standard Time via Optical Fiber Networks","who":"","t":["차세대 기술","정책"]},
+{"id":"PS-1501","d":3,"ev":"CEATEC","s":"10:30","e":"10:45","v":"P스테이지 (홀 4)","code":"PS-1501","ko":"로컬 LLM으로 사내 전용 AI 만들기","en":"Building a Private In-House AI wiith Local LLMs","who":"","t":["AI 전환"]},
+{"id":"PS-1503","d":3,"ev":"CEATEC","s":"11:00","e":"11:15","v":"P스테이지 (홀 4)","code":"PS-1503","ko":"정책 신호를 사업 기회로 · AI '정책 인텔리전스'","en":"From Policy Signals to Business Opportunities - How AI-Powered “Policy Intelligence” Is Transforming Corporate Decision-Making","who":"","t":["AI 전환","정책"]},
+{"id":"PS-1504","d":3,"ev":"CEATEC","s":"11:15","e":"11:30","v":"P스테이지 (홀 4)","code":"PS-1504","ko":"몸을 움직이지 않고 가상 신체를 조작하는 VR","en":"Motion-Less VR: Controlling a Virtual Body without Moving the Physical Body","who":"","t":["스타트업·오픈이노베이션"]},
+{"id":"PS-1505","d":3,"ev":"CEATEC","s":"11:30","e":"11:45","v":"P스테이지 (홀 4)","code":"PS-1505","ko":"뇌 데이터를 사업 가치로","en":"Turning Brain Data into Business Value","who":"","t":["차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"PS-1506","d":3,"ev":"CEATEC","s":"11:45","e":"12:00","v":"P스테이지 (홀 4)","code":"PS-1506","ko":"윤리·법·사회(ELSI) 없이는 혁신도 없다","en":"No Innovation Without ELSI Engagement : Humanistic and Social Science Approaches to Emerging Science and Technology","who":"","t":["서스테이너블","정책"]},
+{"id":"PS-1507","d":3,"ev":"CEATEC","s":"12:00","e":"12:15","v":"P스테이지 (홀 4)","code":"PS-1507","ko":"3D 프린팅으로 사람마다 맞춤 전자기기 · 뇌파 측정과 인터페이스","en":"Electronics Made to Fit Each Person — How 3D Printing Transforms EEG Monitoring and Human Interfaces —","who":"","t":["전자부품·반도체","차세대 기술"]},
+{"id":"PS-1509","d":3,"ev":"CEATEC","s":"12:30","e":"14:00","v":"P스테이지 (홀 4)","code":"PS-1509","ko":"대기업 × 스타트업 공동창출 최전선 · 잠든 자산을 시장으로","en":"Corporates × Startups: The Frontline of Co-Creation — Bringing Dormant Assets and Shining Value to Market","who":"","t":["스타트업·오픈이노베이션"]},
+{"id":"PS-1511","d":3,"ev":"CEATEC","s":"14:00","e":"14:30","v":"P스테이지 (홀 4)","code":"PS-1511","ko":"지능형 제품과 공장을 위한 EU 딥테크 (1)","en":"EU Deep Tech for Intelligent Products and Factories (1)","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"PS-1512","d":3,"ev":"CEATEC","s":"14:30","e":"15:00","v":"P스테이지 (홀 4)","code":"PS-1512","ko":"지능형 제품과 공장을 위한 EU 딥테크 (2)","en":"EU Deep Tech for Intelligent Products and Factories (2)","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"PS-1515","d":3,"ev":"CEATEC","s":"16:00","e":"17:00","v":"P스테이지 (홀 4)","code":"PS-1515","ko":"CEATEC CVC 리버스 피치","en":"CEATEC CVC Reverse Pitch","who":"","t":["스타트업·오픈이노베이션"]},
+{"id":"PS-1516","d":3,"ev":"CEATEC","s":"15:00","e":"15:15","v":"P스테이지 (홀 4)","code":"PS-1516","ko":"에듀테크로 만드는 학습 조직과 차세대 인재","en":"The Fusion of Education, Tech, and Business: Building \"Learning Organizations\" and Next-Generation Talent Development Through EdTech","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"HB-161","d":4,"ev":"CEATEC","s":"10:00","e":"11:00","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-161","ko":"일본 산업의 AI 전환(AX)으로 가는 길","en":"Connecting the Future: Japan’s Path to Industrial AI Transformation (AX)","who":"","t":["AI 전환"]},
+{"id":"HB-162","d":4,"ev":"CEATEC","s":"11:30","e":"12:30","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-162","ko":"국가 연구기관 NICT 제대로 활용하기","en":"How to Make the Most of NICT, Japan’s National Research Institute","who":"","t":["AI 전환","보안"]},
+{"id":"HB-163","d":4,"ev":"CEATEC","s":"13:00","e":"15:00","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-163","ko":"디지털과 신기술로 진화하는 새로운 교통 서비스","en":"The Evolution of New Transportation Services Leveraging Digital and New Technologies","who":"","t":["모빌리티","정책"]},
+{"id":"HB-164","d":4,"ev":"CEATEC","s":"15:30","e":"16:30","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-164","ko":"이해하기 힘든 시대, 미래 탐색은 무엇을 남길까","en":"What Does Exploring the Future Bring Us in an Age Beyond Comprehension?","who":"도미오카 게이(도시바 디자인총괄실장), 후지이 다이요(SF 작가)","t":["AI 전환","차세대 기술"]},
+{"id":"HB-165","d":4,"ev":"CEATEC","s":"16:45","e":"17:45","v":"컨벤션홀 B (국제회의장 2F)","code":"HB-165","ko":"무형자산은 어떻게 기업가치를 만드는가","en":"How Can Intangible Assets Drive Corporate Value ?","who":"나카하라 히로히코(내각부 지식재산전략추진사무국장)","t":["AI 전환"]},
+{"id":"HA-161","d":4,"ev":"CEATEC","s":"10:00","e":"11:00","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-161","ko":"신사업을 회사의 본업으로 만들려면 · 오사카가스와 가와사키중공업 사례","en":"From \"It Matters\" to \"It's Built In\": What It Takes to Make New Business Core — Insights from Osaka Gas, and Kawasaki Heavy Industries","who":"오사카가스, 가와사키중공업","t":["차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"HA-162","d":4,"ev":"CEATEC","s":"11:30","e":"12:30","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-162","ko":"AI 퍼스트 사회를 움직이는 위치 데이터","en":"Location Data Driving an AI-First Society","who":"","t":["AI 전환","데이터·클라우드"]},
+{"id":"HA-163","d":4,"ev":"CEATEC","s":"13:00","e":"14:00","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-163","ko":"피지컬 AI × 6G · 사회 변혁과 인간 확장을 이끌 차세대 인프라","en":"Physical AI × 6G: Next-Gen Infrastructure Driving Societal Transformation and Human Augmentation","who":"","t":["AI 전환","정책"]},
+{"id":"HA-164","d":4,"ev":"CEATEC","s":"14:30","e":"16:00","v":"컨벤션홀 A (국제회의장 2F)","code":"HA-164","ko":"저궤도 위성 네트워크가 바꿀 사회","en":"Orbiting Tomorrow: The Future Society Enabled by LEO Satellite Networks","who":"","t":["차세대 통신"]},
+{"id":"R2-161","d":4,"ev":"CEATEC","s":"10:00","e":"13:00","v":"201 회의실 (국제회의장 2F)","code":"R2-161","ko":"비전에서 실행으로 · 엣지 AI와 행정 AI 전환의 다음 단계","en":"From Vision to Action -Edge AI and the Next Stage of Government AI Transformation","who":"","t":["AI 전환"]},
+{"id":"R2-163","d":4,"ev":"CEATEC","s":"15:00","e":"16:00","v":"201 회의실 (국제회의장 2F)","code":"R2-163","ko":"AI 요로 선생과 미래를 이야기하다","en":"Discussing the Future with AI Dr. Yoro","who":"요로 다케시(도쿄대 명예교수), 히로세 미치타카(도쿄공과대), 이즈미 기요시(도쿄대)","t":["AI 전환","차세대 기술"]},
+{"id":"ES-161","d":4,"ev":"CEATEC","s":"10:15","e":"11:15","v":"E스테이지 (홀 8)","code":"ES-161","ko":"사이버 위협 동향과 공급망 보안 · SCS 평가제도로 바꾸는 기업 보안","en":"Cyber Threat Trnds amd Third-Party Risk Management Challenges: Transforming Corporate Security Through the SCS Assessment Scheme","who":"","t":["보안","정책"]},
+{"id":"ES-162","d":4,"ev":"CEATEC","s":"11:30","e":"12:30","v":"E스테이지 (홀 8)","code":"ES-162","ko":"대형 제조사 신사업 개발의 현실 · 히타치와 PFU, 시장 주도인가 기술 주도인가","en":"The Reality of New Business Development at Major Manufacturers: A Discussion with Business Leaders from Hitachi and PFU — Market-Driven or Technology-Driven?","who":"히타치, PFU 사업 리더","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"ES-163","d":4,"ev":"CEATEC","s":"12:45","e":"13:45","v":"E스테이지 (홀 8)","code":"ES-163","ko":"AI는 정말 현장을 바꿀 수 있나 · 디지털 트윈과 그 너머","en":"Can AI Truly Transform Real-World Operations? Digital twins—and beyond. Exploring how AI can be applied to the physical world.","who":"사토 도모나리(Vantiq)","t":["AI 전환"]},
+{"id":"ES-164","d":4,"ev":"CEATEC","s":"14:00","e":"15:00","v":"E스테이지 (홀 8)","code":"ES-164","ko":"EU 진출 거점으로서의 룩셈부르크 · 세제·규제·혁신","en":"Luxembourg as a Strategic Gateway for EU Business: An Integrated Advantage in Taxation, Regulation, and Innovation","who":"룩셈부르크 무역투자사무소(도쿄)","t":["스타트업·오픈이노베이션","정책"]},
+{"id":"ES-165","d":4,"ev":"CEATEC","s":"15:30","e":"16:30","v":"E스테이지 (홀 8)","code":"ES-165","ko":"피지컬 AI의 미래 · 자율주행차에서 휴머노이드까지","en":"The Future of Physical AI From Cars to Humanoids","who":"가와하라 쇼타로(모빌아이 재팬 대표)","t":["AI 전환","모빌리티"],"pick":1},
+{"id":"TS-161","d":4,"ev":"CEATEC","s":"10:15","e":"11:15","v":"T스테이지 (홀 6)","code":"TS-161","ko":"JTB는 왜 사업개발에 힘을 쏟나 · 신사업이 바꾸는 조직과 인재","en":"Why JTB Prioritizes Business Development How New Business Creation Drives Organizational Transformation and Talent Growth","who":"노무라 겐지(JTB)","t":["스타트업·오픈이노베이션"]},
+{"id":"TS-162","d":4,"ev":"CEATEC","s":"11:30","e":"12:30","v":"T스테이지 (홀 6)","code":"TS-162","ko":"정보 세계와 물리 세계를 잇는 힘 제어","en":"Force Control as a Bridge between the Information World and the Physical World","who":"사카이노 쇼(쓰쿠바대 준교수)","t":["AI 전환","정책"]},
+{"id":"TS-163","d":4,"ev":"CEATEC","s":"12:45","e":"13:45","v":"T스테이지 (홀 6)","code":"TS-163","ko":"고등전문학교 × 반도체 엔지니어 커리어 세션","en":"KOSEN × Semiconductor Engineer Career Session","who":"","t":["전자부품·반도체"]},
+{"id":"TS-164","d":4,"ev":"CEATEC","s":"14:00","e":"15:00","v":"T스테이지 (홀 6)","code":"TS-164","ko":"사내 기술로 사업을 만들기 어려운 이유 · 대형 완성차 현장에서 배운 사업화 방법론","en":"Why Is It So Hard to Build a Business from In-House Technology? A Methodology for Commercializing Technology, Drawn from Firsthand Experience at a Major Automaker","who":"","t":["차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"TS-165","d":4,"ev":"CEATEC","s":"15:15","e":"16:45","v":"T스테이지 (홀 6)","code":"TS-165","ko":"반도체 인재 육성 아카데미아 세션","en":"Semiconductor Human Resource Development Academia Session","who":"야마구치 다케시(닛케이BP 종합연구소)","t":["전자부품·반도체"]},
+{"id":"XS-161","d":4,"ev":"CEATEC","s":"10:30","e":"11:30","v":"X스테이지 (홀 5)","code":"XS-161","ko":"사이버-피지컬 경제와 '인터버스 스마트시티'의 미래 도시","en":"The Cyber-Physical Economy: Current Trends and Future Urban Scenarios through “Interverse-Enabled Smart Cities”","who":"모치마루 마사아키(AIST 펠로)","t":["AI 전환","정책"]},
+{"id":"XS-162","d":4,"ev":"CEATEC","s":"11:45","e":"12:45","v":"X스테이지 (홀 5)","code":"XS-162","ko":"오사카 슈퍼시티 소개","en":"About Osaka Super City","who":"","t":["스마트시티·홈","스타트업·오픈이노베이션"]},
+{"id":"XS-163","d":4,"ev":"CEATEC","s":"13:00","e":"14:00","v":"X스테이지 (홀 5)","code":"XS-163","ko":"산업용 무선 시스템의 안정 운용","en":"Towards Stable Operation of Industrial Wireless Systems","who":"","t":["차세대 통신"]},
+{"id":"XS-164","d":4,"ev":"CEATEC","s":"14:15","e":"14:50","v":"X스테이지 (홀 5)","code":"XS-164","ko":"양자컴퓨터와 슈퍼컴퓨터를 묶는 하이브리드 플랫폼 JHPC-quantum","en":"JHPC-quantum: A Quantum–Supercomputer Hybrid Computing Platform for Quantum Advantage and Utility","who":"","t":["AI 전환","차세대 기술"]},
+{"id":"XS-165","d":4,"ev":"CEATEC","s":"14:50","e":"15:25","v":"X스테이지 (홀 5)","code":"XS-165","ko":"AI와 CAE의 공진화 · 3D 생성 AI와 멀티피델리티 시뮬레이션이 여는 설계","en":"How Will AI and CAE Co-Evolve? The Future of Design Exploration Enabled by 3D Generative AI and Multi-Fidelity Simulation","who":"","t":["AI 전환","모빌리티"]},
+{"id":"XS-166","d":4,"ev":"CEATEC","s":"15:25","e":"16:00","v":"X스테이지 (홀 5)","code":"XS-166","ko":"AI가 제조를 만날 때 · 자동차 공력 설계에서 AI의 창의성 다루기","en":"When AI Meets Manufacturing: The Challenge of Controlling AI Creativity in Automotive Aerodynamic Design","who":"","t":["AI 전환","모빌리티"]},
+{"id":"XS-167","d":4,"ev":"CEATEC","s":"16:00","e":"16:30","v":"X스테이지 (홀 5)","code":"XS-167","ko":"슈퍼컴퓨터 '후가쿠'로 액체 로켓엔진 연소기 대규모 시뮬레이션","en":"Large-Scale Simulation of Liquid Rocket Engine Combustors Utilizing the Supercomputer \"Fugaku\"","who":"","t":["모빌리티","차세대 기술"]},
+{"id":"PS-1607","d":4,"ev":"CEATEC","s":"12:00","e":"12:15","v":"P스테이지 (홀 4)","code":"PS-1607","ko":"배터리 없는 센싱 · 체온 에너지 하베스팅 실증","en":"Battery-Free Future for Sensing — A Proof-of-Concept Using Body-Heat Energy Harvesting —","who":"","t":["전자부품·반도체","그린·에너지"]},
+{"id":"PS-1608","d":4,"ev":"CEATEC","s":"12:15","e":"12:30","v":"P스테이지 (홀 4)","code":"PS-1608","ko":"혁신 소재 × 초고속 열 감지로 세계 시장 개척","en":"Revolutionary Materials × Ultra-Fast Heat Detection = Pioneering Global Markets","who":"","t":["모빌리티","전자부품·반도체","차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"PS-1609","d":4,"ev":"CEATEC","s":"12:30","e":"12:45","v":"P스테이지 (홀 4)","code":"PS-1609","ko":"세계 최소 MEMS 촉각 센서","en":"The world smallest MEMS tactile senosor","who":"","t":["AI 전환","전자부품·반도체","차세대 기술"]},
+{"id":"PS-1611","d":4,"ev":"CEATEC","s":"13:00","e":"14:30","v":"P스테이지 (홀 4)","code":"PS-1611","ko":"미래를 만드는 혁신가와의 대화 · 제11회 JEITA 벤처상 피치&토크","en":"Dialogues with Innovators Shaping the Future: The 11th JEITA Venture Awards Pitch & Talk Session","who":"","t":["그린·에너지","스타트업·오픈이노베이션"]},
+{"id":"PS-1612","d":4,"ev":"CEATEC","s":"14:30","e":"14:45","v":"P스테이지 (홀 4)","code":"PS-1612","ko":"적응형 로봇을 위한 피지컬 AI","en":"Physical AI for Adaptive Robots","who":"","t":["AI 전환","차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"PS-1613","d":4,"ev":"CEATEC","s":"14:45","e":"15:00","v":"P스테이지 (홀 4)","code":"PS-1613","ko":"MONO-COTO INNOVATION 2026 우승팀 발표","en":"MONO-COTO INNOVATION 2026 Winning Team Presentation","who":"","t":["차세대 기술"]},
+{"id":"PS-1614","d":4,"ev":"CEATEC","s":"15:00","e":"15:15","v":"P스테이지 (홀 4)","code":"PS-1614","ko":"다음 경쟁력은 의사결정 인텔리전스","en":"Why the Next Competitive Advantage Is Decision Intelligence","who":"","t":["차세대 기술","스타트업·오픈이노베이션"]},
+{"id":"PS-1617","d":4,"ev":"CEATEC","s":"15:45","e":"16:00","v":"P스테이지 (홀 4)","code":"PS-1617","ko":"마시는 와인에서 즐기는 자산으로 · 와인뱅크의 유통 혁신","en":"From Wine You Drink to Assets You Keep Enjoying: WineBank Is Transforming the Future of Wine Distribution","who":"","t":["데이터·클라우드"]},
+{"id":"PS-1619","d":4,"ev":"CEATEC","s":"16:15","e":"16:30","v":"P스테이지 (홀 4)","code":"PS-1619","ko":"소형 AI 회전기계 이상 감지와 교육·연구 활용 (1)","en":"Compact AI-Based Rotating Machinery Anomaly Detection and Its Applications in Education and Research","who":"","t":["AI 전환","차세대 기술"]},
+{"id":"PS-1620","d":4,"ev":"CEATEC","s":"16:30","e":"16:45","v":"P스테이지 (홀 4)","code":"PS-1620","ko":"소형 AI 회전기계 이상 감지와 교육·연구 활용 (2)","en":"Compact AI-Based Rotating Machinery Anomaly Detection and Its Applications in Education and Research","who":"","t":["AI 전환","스타트업·오픈이노베이션"]},
+{"id":"ON-01","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-01","ko":"HATS 컨퍼런스 2026 · 통신 환경 전환기의 품질 확보","en":"HATS conference 2026","who":"","t":["차세대 통신","서스테이너블"],"per":"10/1 – 10/30"},
+{"id":"ON-02","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-02","ko":"누구나 쓸 수 있는 웹의 기본 · 웹 접근성 입문","en":"The Basics of the Web for Everyone ~Introduction to Web Accessibility~","who":"","t":["서스테이너블"],"per":"9/15 – 10/30"},
+{"id":"ON-04","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-04","ko":"IT 트렌드 조사 · AI 도입에서 배운 것과 IT 플랫폼 전망","en":"IT Trend Survey ～Key Learnings from AI Adoption and the Future Outlook for IT Platforms～","who":"","t":["AI 전환","데이터·클라우드"],"per":"10/1 – 10/30"},
+{"id":"ON-05","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-05","ko":"인클루시브 디자인으로 접근성 높이기","en":"Improving Accessibility Through Inclusive Design","who":"","t":["서스테이너블"],"per":"9/15 – 10/30"},
+{"id":"ON-06","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-06","ko":"반도체 혁신으로 미래를 움직이다","en":"Driving the Future Through Semiconductor Innovation","who":"","t":["전자부품·반도체","정책"],"per":"9/15 – 10/30"},
+{"id":"ON-07","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-07","ko":"압도적 강점이 왜 변혁을 가로막나 · TDK가 다음 성장의 파도를 만드는 법","en":"Why Do enterprises’ “Overwhelming Strengths” Hinder Transformation? TDK’s new Approach to “Creating the Next Wave of Growth”","who":"TDK","t":["데이터·클라우드","모빌리티"],"per":"9/17 – 10/16"},
+{"id":"ON-08","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-08","ko":"AI·사이버보안 세션 하이라이트","en":"The Highlights of the Sessions of AI and Cybersecurity","who":"","t":["보안","AI 전환"],"per":"9/15 – 10/30"},
+{"id":"ON-09","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-09","ko":"현실 세계로 확장되는 AI · 정보기술과 사회 구현의 통합","en":"AI Expanding into the Real World: Integration of Information Technology and Societal Deployment","who":"","t":["AI 전환","차세대 기술"],"per":"9/25 – 10/30"},
+{"id":"ON-10","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-10","ko":"AI를 '쓰는' 데서 AI와 '일하는' 데로 · AI BPR로 바꾸는 업무와 조직","en":"From \"Using\" AI to AI \"At Work\": Transforming Next-Generation Operations and Organizational Design through AI BPR","who":"","t":["AI 전환"],"per":"9/15 – 10/30"},
+{"id":"ON-11","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-11","ko":"AI가 바꾸는 스타트업 투자 유치","en":"How AI Is Democratizing Startup Fundraising","who":"","t":["AI 전환","스타트업·오픈이노베이션"],"per":"9/15 – 10/30"},
+{"id":"ON-12","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-12","ko":"카메라 한 대로 도시 모빌리티 전 과정 추적","en":"One Camera, Full Cycle Urban Mobility Tracking","who":"","t":["AI 전환","모빌리티"],"per":"10/5 – 10/30"},
+{"id":"ON-13","d":5,"ev":"CEATEC","s":null,"e":null,"v":"온라인 (CEATEC 공식 사이트)","code":"ON-13","ko":"쉬지 않고 지켜보는 AI · NetXMS로 하는 자율 모니터링과 친환경 데이터센터","en":"The AI That Never Stops Watching — Autonomous Monitoring and Green DC Insights with NetXMS","who":"","t":["AI 전환","그린·에너지"],"per":"9/15 – 10/30"}
+];
+const B=[
+ {id:"b-jama",ev:"JMS",hall:"홀 2–3 중앙",ko:"자공회 회원사 합동전시 「MOVE JAPAN」",desc:"멀티패스웨이, 수소 보급, 공동물류, 자율주행, 주행 중 무선급전, 서큘러 이코노미 6개 주제",t:["모빌리티","에너지·탈탄소"]},
+ {id:"b-z2",ev:"JMS",hall:"홀 2–3 ZONE 2",ko:"ZONE 2 · 환경도 경제도",desc:"주행 중 무선급전, 수소 간선 구상, 카본뉴트럴 연료",t:["에너지·탈탄소"]},
+ {id:"b-z3",ev:"JMS",hall:"홀 2–3 ZONE 3",ko:"ZONE 3 · 테크놀로지와 사람",desc:"배터리·소재 자원순환, AI·로봇 활용 인재기반",t:["소재·배터리","AI·로봇"]},
+ {id:"b-cons",ev:"JMS",hall:"홀 2–3",ko:"컨소시엄 부스",desc:"Garraway F/O, SORATO NRT, STATION Ai, 쓰루오카 사이언스파크",t:["신사업"]},
+ {id:"b-basc",ev:"CEATEC",hall:"CEATEC 홀",ko:"전지 서플라이체인 협의회(BASC)",desc:"미쓰비시케미칼, 일본촉매, 쿠레하, 센트럴글라스, 스미토모금속광산, JX금속, 파나소닉에너지 등 60여 사 공동",t:["소재·배터리"]},
+ {id:"b-semi",ev:"CEATEC",hall:"X파크",ko:"JEITA 반도체 포럼 2026",desc:"키옥시아, 소니세미컨덕터, 르네사스, 롬, 미쓰비시전기, 도시바, 마이크론, 누보톤, 산켄",t:["반도체"]},
+ {id:"b-dts",ev:"CEATEC",hall:"X파크 (신설)",ko:"디지털 교통사회 파빌리온",desc:"국토교통성 도로국, MONET, 라쿠텐모바일, 손보재팬, 대만 Turing Drive 등",t:["모빌리티"]},
+ {id:"b-wipot",ev:"CEATEC",hall:"CEATEC 홀",ko:"무선전력전송 실용화 컨소시엄 WiPoT",desc:"파나소닉HD, 니치콘, 아사히카세이일렉트로닉스, 전기흥업",t:["에너지·탈탄소","반도체"]},
+ {id:"b-inoel",ev:"CEATEC",hall:"넥스트제너레이션파크",ko:"야마가타대 INOEL",desc:"플렉서블 일렉트로닉스, 유기·차세대 태양전지, 자원순환 그린 디바이스",t:["소재·배터리","에너지·탈탄소"]},
+ {id:"b-teijin",ev:"CEATEC",hall:"X파크 (서스테이너블)",ko:"TA프런티어 (데이진프런티어)",desc:"섬유·소재 기반 전시",t:["소재·배터리"]},
+ {id:"b-comp",ev:"CEATEC",hall:"일반전시",ko:"전자부품 3사: 무라타 · TDK · 다이요유덴",desc:"차재·통신용 부품, 신규 디바이스",t:["반도체","모빌리티"]},
+ {id:"b-auto",ev:"CEATEC",hall:"일반전시",ko:"덴소 · 아이신 · 혼다기술연구소",desc:"CEATEC 측 자동차 계열 출전",t:["모빌리티"]},
+ {id:"b-award",ev:"JOINT",hall:"CEATEC AWARD",ko:"CEATEC AWARD 모빌리티 혁신부문 최종후보 10사",desc:"Seibii, Spectee, eMotion Fleet, 옵티마인드, 에버블루테크놀로지스, LIFEHUB, ELEMEC, Virtual Motorsport Lab, glafit, RIDE DESIGN",t:["모빌리티","신사업"]}
+];
+const KEY="mkh26-planner-v2";
+let st={view:"time",day:1,ev:"ALL",tag:null,bTag:null,plan:{},booths:{},notes:{}};
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);Object.assign(st,o);return true}}catch(e){}return false}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({day:st.day,view:st.view,plan:st.plan,booths:st.booths,notes:st.notes}))}catch(e){}}
+if(!load()){S.filter(x=>x.pick).forEach(x=>st.plan[x.id]=1);st.booths["b-basc"]={day:2,done:false};st.booths["b-jama"]={day:1,done:false}}
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mins=t=>{const[a,b]=t.split(":");return +a*60+ +b};
+function sorted(arr){return arr.slice().sort((a,b)=>(a.s?mins(a.s):-1)-(b.s?mins(b.s):-1))}
+function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,1800)}
+
+function dday(){const now=new Date();const open=new Date("2026-10-13T00:00:00+09:00");const end=new Date("2026-10-17T00:00:00+09:00");
+ const kst=new Date(now.toLocaleString("en-US",{timeZone:"Asia/Seoul"}));const today=new Date(Date.UTC(kst.getFullYear(),kst.getMonth(),kst.getDate()));
+ const diff=Math.round((Date.UTC(2026,9,13)-today)/864e5);
+ if(now>=end){$("#ddayLabel").textContent="행사 종료";$("#dday").textContent="—"}else if(diff<=0){$("#ddayLabel").textContent="진행 중";$("#dday").textContent="DAY "+(1-diff)}else{$("#dday").textContent="D-"+diff}}
+
+function renderDays(){const counts=d=>S.filter(x=>x.d===d&&st.plan[x.id]).length+Object.values(st.booths).filter(b=>b.day===d).length;
+ $("#dayBar").innerHTML=DAYS.map(x=>`<button class="day" aria-pressed="${st.day===x.d}" data-day="${x.d}"><small>${x.d<5?"DAY "+x.d+" · "+x.wd:"기간 중"}</small><b>${x.label}</b><small>${st.view==="plan"?counts(x.d)+"개 담음":S.filter(s=>s.d===x.d).length+"개"}</small></button>`).join("");
+ $("#dayBar").hidden=(st.view==="booth"||st.view==="info")}
+
+function renderFilters(){const evs=["ALL","JMS","CEATEC"];
+ $("#filters").innerHTML=evs.map(e=>`<button class="chip" data-ev="${e}" aria-pressed="${st.ev===e}">${e==="ALL"?"전체":EVN[e]}</button>`).join("")+`<span class="sep"></span>`+OTAGS.map(t=>`<button class="chip" data-tag="${t}" aria-pressed="${st.tag===t}">${t}</button>`).join("")}
+
+function card(x,opts={}){const tm=x.s?`<div class="time">${x.s}<span>${x.e||""}</span></div>`:x.per?`<div class="time">온라인<span>${x.per}</span></div>`:`<div class="time tbd">시간<br>미정</div>`;
+ const on=!!st.plan[x.id];
+ return `<div class="slot"><div>${tm}</div><div class="body">
+  <div class="meta"><span class="ev ${x.ev}">${EVN[x.ev]}</span>${x.k?`<span class="kind ${x.k}">${KN[x.k]}</span>`:""}<span>${esc(x.code)}</span><span>· ${esc(x.v)}</span>${x.pick&&!opts.plan?'<span class="pick">추천</span>':""}${opts.conflict?'<span class="conflict">시간 겹침</span>':""}</div>
+  <div class="row"><div class="body"><p class="title">${esc(x.ko)}</p></div>
+  <button class="star" data-star="${x.id}" aria-pressed="${on}">${on?"담음 ✓":"+ 담기"}</button></div>
+  <div class="who">${esc(x.who)}</div>
+  <div class="meta">${x.t.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+  ${opts.plan?`<textarea id="note-${x.id}" data-note="${x.id}" placeholder="메모: 질문할 것, 만날 사람…">${esc(st.notes[x.id]||"")}</textarea>`:""}
+ </div></div>`}
+
+function renderTime(){let arr=S.filter(x=>x.d===st.day);if(st.ev!=="ALL")arr=arr.filter(x=>x.ev===st.ev||x.ev==="JOINT");if(st.tag)arr=arr.filter(x=>x.t.includes(st.tag));const q=($("#q").value||"").trim().toLowerCase();if(q)arr=arr.filter(x=>[x.ko,x.en||"",x.code,x.who,x.v].join(" ").toLowerCase().includes(q));
+ if(!arr.length){$("#timeList").innerHTML=`<div class="empty">조건에 맞는 세션이 없습니다. 필터를 풀어보세요.</div>`;return}
+ if(st.ev==="JMS"){$("#timeList").innerHTML=["special","business","stage"].map(k=>{const g=sorted(arr.filter(x=>x.k===k));return g.length?`<h3 class="group-h ${k}">${KN[k]}<small>${KD[k]}</small></h3><div class="list">${g.map(x=>card(x)).join("")}</div>`:""}).join("")+(arr.some(x=>!x.k)?`<h3 class="group-h">CEATEC 공동 세션</h3><div class="list">${sorted(arr.filter(x=>!x.k)).map(x=>card(x)).join("")}</div>`:"");return}
+ $("#timeList").innerHTML=sorted(arr).map(x=>card(x)).join("")}
+
+function conflicts(arr){const c=new Set();const t=arr.filter(x=>x.s);for(let i=0;i<t.length;i++)for(let j=i+1;j<t.length;j++){const a=t[i],b=t[j];if(mins(a.s)<mins(b.e)&&mins(b.s)<mins(a.e)){c.add(a.id);c.add(b.id)}}return c}
+
+function renderPlan(){const arr=sorted(S.filter(x=>x.d===st.day&&st.plan[x.id]));const c=conflicts(arr);
+ $("#planList").innerHTML=arr.length?arr.map(x=>card(x,{plan:1,conflict:c.has(x.id)})).join(""):`<div class="empty">이날 담은 세션이 없습니다. 타임테이블에서 <b>+ 담기</b>를 누르세요.</div>`;
+ const bs=B.filter(b=>st.booths[b.id]&&st.booths[b.id].day===st.day);
+ $("#planBooths").innerHTML=bs.length?bs.map(boothRow).join(""):`<div class="empty">이날로 지정한 부스가 없습니다. 부스 방문 탭에서 날짜를 고르세요.</div>`}
+
+function boothRow(b){const s=st.booths[b.id];const done=s&&s.done;
+ return `<div class="booth ${done?"done":""}"><div class="body"><div class="meta"><span class="ev ${b.ev}">${EVN[b.ev]}</span><span>${esc(b.hall)}</span></div><p class="title">${esc(b.ko)}</p><div class="who">${esc(b.desc)}</div><div class="meta">${b.t.map(t=>`<span class="tag">${t}</span>`).join("")}</div></div>
+ <div class="body" style="justify-items:end"><select id="bd-${b.id}" data-bday="${b.id}" aria-label="방문일"><option value="0">방문일 선택</option>${DAYS.filter(d=>d.d<5).map(d=>`<option value="${d.d}" ${s&&s.day===d.d?"selected":""}>${d.label}(${d.wd})</option>`).join("")}</select>
+ ${s?`<label class="check"><input type="checkbox" id="bc-${b.id}" data-bdone="${b.id}" ${done?"checked":""}>방문 완료</label>`:""}</div></div>`}
+
+function renderBooths(){$("#boothFilters").innerHTML=TAGS.map(t=>`<button class="chip" data-btag="${t}" aria-pressed="${st.bTag===t}">${t}</button>`).join("");
+ const arr=st.bTag?B.filter(b=>b.t.includes(st.bTag)):B;$("#boothList").innerHTML=arr.map(boothRow).join("")}
+
+function counts(){$("#planCount").textContent=Object.keys(st.plan).length;$("#boothCount").textContent=Object.keys(st.booths).length}
+
+function render(){["time","plan","booth","info"].forEach(v=>{$("#v-"+v).hidden=st.view!==v;$("#t-"+v).setAttribute("aria-selected",st.view===v)});
+ renderDays();counts();if(st.view==="time"){renderFilters();renderTime()}if(st.view==="plan")renderPlan();if(st.view==="booth")renderBooths()}
+
+document.addEventListener("click",e=>{const el=e.target.closest("button");if(!el)return;
+ if(el.dataset.view){st.view=el.dataset.view;save();render();return}
+ if(el.dataset.day){st.day=+el.dataset.day;save();render();return}
+ if(el.dataset.ev){st.ev=el.dataset.ev;render();return}
+ if(el.dataset.tag){st.tag=st.tag===el.dataset.tag?null:el.dataset.tag;render();return}
+ if(el.dataset.btag){st.bTag=st.bTag===el.dataset.btag?null:el.dataset.btag;render();return}
+ if(el.dataset.star){const id=el.dataset.star;if(st.plan[id]){delete st.plan[id];toast("일정에서 뺐습니다")}else{st.plan[id]=1;toast("내 일정에 담았습니다")}save();render();return}
+ if(el.id==="copyPlan"){copyPlan()}});
+document.addEventListener("change",e=>{const t=e.target;
+ if(t.dataset.bday){const id=t.dataset.bday,d=+t.value;if(d)st.booths[id]={day:d,done:st.booths[id]?.done||false};else delete st.booths[id];save();render()}
+ if(t.dataset.bdone){st.booths[t.dataset.bdone].done=t.checked;save();render()}});
+document.addEventListener("input",e=>{const t=e.target;if(t.id==="q"){renderTime();return}if(t.dataset.note){st.notes[t.dataset.note]=t.value;save()}});
+
+function planText(){let out="[JMS Bizweek × CEATEC 2026 참관 일정]\n";
+ DAYS.forEach(d=>{const arr=sorted(S.filter(x=>x.d===d.d&&st.plan[x.id]));const bs=B.filter(b=>st.booths[b.id]&&st.booths[b.id].day===d.d);if(!arr.length&&!bs.length)return;
+  out+=`\n■ ${d.label}${d.wd?"("+d.wd+")":""}\n`;arr.forEach(x=>{out+=`- ${x.s?x.s+"–"+x.e:x.per?"온라인 "+x.per:"시간 미정"} [${EVN[x.ev]}${x.k?" "+KN[x.k]:""}] ${x.ko} (${x.v})\n`;if(st.notes[x.id])out+=`  메모: ${st.notes[x.id]}\n`});
+  bs.forEach(b=>out+=`- 부스: ${b.ko} (${b.hall})${st.booths[b.id].done?" ✓":""}\n`)});return out}
+function copyPlan(){const txt=planText();
+ navigator.clipboard?.writeText(txt).then(()=>toast("일정을 복사했습니다")).catch(()=>fallback(txt))||fallback(txt)}
+function fallback(txt){const ta=document.createElement("textarea");ta.value=txt;ta.id="copy-fallback";ta.style.minHeight="200px";$("#v-plan .toolbar").after(ta);ta.select();toast("텍스트를 선택해 두었습니다. 직접 복사하세요")}
+
+dday();render();
+</script>
+
+</body>
+</html>
