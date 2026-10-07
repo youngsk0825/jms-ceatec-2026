@@ -146,8 +146,9 @@ a{color:var(--accent)}
 
   <section id="v-plan" hidden>
     <div class="toolbar">
-      <button class="btn" id="copyPlan">일정 텍스트 복사</button>
-      <span class="note" style="margin:0">담은 일정과 메모는 이 브라우저에 저장됩니다.</span>
+      <button class="btn" id="exportIcs">캘린더에 추가 (.ics)</button>
+      <button class="btn ghost" id="copyPlan">일정 텍스트 복사</button>
+      <span class="note" style="margin:0">담은 일정과 메모는 이 브라우저에 저장됩니다. 캘린더에는 일본 시간 기준으로 들어가며 15분 전 알림이 붙습니다.</span>
     </div>
     <div class="list" id="planList"></div>
     <h2 class="section-h" id="planBoothH">이날 방문할 부스</h2>
@@ -496,7 +497,8 @@ document.addEventListener("click",e=>{const el=e.target.closest("button");if(!el
  if(el.dataset.tag){st.tag=st.tag===el.dataset.tag?null:el.dataset.tag;render();return}
  if(el.dataset.btag){st.bTag=st.bTag===el.dataset.btag?null:el.dataset.btag;render();return}
  if(el.dataset.star){const id=el.dataset.star;if(st.plan[id]){delete st.plan[id];toast("일정에서 뺐습니다")}else{st.plan[id]=1;toast("내 일정에 담았습니다")}save();render();return}
- if(el.id==="copyPlan"){copyPlan()}});
+ if(el.id==="copyPlan"){copyPlan()}
+ if(el.id==="exportIcs"){exportIcs()}});
 document.addEventListener("change",e=>{const t=e.target;
  if(t.dataset.bday){const id=t.dataset.bday,d=+t.value;if(d)st.booths[id]={day:d,done:st.booths[id]?.done||false};else delete st.booths[id];save();render()}
  if(t.dataset.bdone){st.booths[t.dataset.bdone].done=t.checked;save();render()}});
@@ -509,6 +511,25 @@ function planText(){let out="[JMS Bizweek × CEATEC 2026 참관 일정]\n";
 function copyPlan(){const txt=planText();
  navigator.clipboard?.writeText(txt).then(()=>toast("일정을 복사했습니다")).catch(()=>fallback(txt))||fallback(txt)}
 function fallback(txt){const ta=document.createElement("textarea");ta.value=txt;ta.id="copy-fallback";ta.style.minHeight="200px";$("#v-plan .toolbar").after(ta);ta.select();toast("텍스트를 선택해 두었습니다. 직접 복사하세요")}
+
+
+function icsEsc(t){return String(t).replace(/\\/g,"\\\\").replace(/;/g,"\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n")}
+function icsFold(line){const enc=new TextEncoder();const out=[];let cur="",n=0;for(const ch of line){const b=enc.encode(ch).length;if(n+b>73){out.push(cur);cur=" "+ch;n=1+b}else{cur+=ch;n+=b}}out.push(cur);return out.join("\r\n")}
+function icsTime(d,hm){const [h,m]=hm.split(":").map(Number);const t=new Date(Date.UTC(2026,9,12+d,h-9,m));return t.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"")}
+function buildIcs(){const now=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+ const evs=S.filter(x=>st.plan[x.id]&&x.s&&x.d<5);
+ const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//jms-ceatec-2026//planner//KO","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:JMS Bizweek × CEATEC 2026","X-WR-TIMEZONE:Asia/Tokyo"];
+ evs.forEach(x=>{const kind=x.k?" "+KN[x.k]:"";const desc=[(EVN[x.ev]+kind+" · "+x.code),x.who,st.notes[x.id]?"메모: "+st.notes[x.id]:""].filter(Boolean).join("\n");
+  L.push("BEGIN:VEVENT","UID:"+x.id+"@jms-ceatec-2026","DTSTAMP:"+now,"DTSTART:"+icsTime(x.d,x.s),"DTEND:"+icsTime(x.d,x.e||x.s),
+   "SUMMARY:"+icsEsc("["+EVN[x.ev]+"] "+x.ko),"LOCATION:"+icsEsc(x.v+", 마쿠하리 메세 (Makuhari Messe)"),"DESCRIPTION:"+icsEsc(desc),
+   "BEGIN:VALARM","TRIGGER:-PT15M","ACTION:DISPLAY","DESCRIPTION:"+icsEsc(x.ko),"END:VALARM","END:VEVENT")});
+ L.push("END:VCALENDAR");return {text:L.map(icsFold).join("\r\n")+"\r\n",count:evs.length,skipped:S.filter(x=>st.plan[x.id]&&(!x.s||x.d===5)).length}}
+function exportIcs(){const r=buildIcs();if(!r.count){toast("캘린더로 보낼 세션이 없습니다. 시간이 정해진 세션을 담아 주세요");return}
+ const blob=new Blob([r.text],{type:"text/calendar;charset=utf-8"});const url=URL.createObjectURL(blob);
+ const ios=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+ if(ios){location.href=url}else{const a=document.createElement("a");a.href=url;a.download="jms-ceatec-2026.ics";document.body.appendChild(a);a.click();a.remove()}
+ setTimeout(()=>URL.revokeObjectURL(url),60000);
+ toast(`세션 ${r.count}개를 캘린더 파일로 만들었습니다`+(r.skipped?` (시간 미정·온라인 ${r.skipped}개 제외)`:""))}
 
 dday();render();
 </script>
